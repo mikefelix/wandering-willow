@@ -1,26 +1,50 @@
-function getRandomDirection(point){
-    //return getTrulyRandomDirection();
-    return getRandomCenteredDirection(point);
+function resizeCanvas(){
+    var canvas = document.getElementById('canvas');
 }
 
-function getDirectionWithFavored(point, favored) {
-    var r = Math.random();
-    if (r < 0.6)
-        return favored;
-    else
-        return getTrulyRandomDirection(point);
+function Grid(canvas, cellSize, getDirection) {
+    var windowHeight = window.innerHeight;
+    var windowWidth = window.innerWidth;
+
+    this.canvas = canvas;
+    canvas.width = canvas.style.width = windowWidth;
+    canvas.height = canvas.style.height = windowHeight;
+
+    this.pixelWidth = parseInt(canvas.style.width.replace(/\D/, ''));
+    this.pixelHeight = parseInt(canvas.style.height.replace(/\D/, ''));
+    this.cellSize = cellSize;
+    this.width = Math.floor(this.pixelWidth / cellSize);
+    this.height = Math.floor(this.pixelHeight / cellSize);
+    this.count = 0;
+    this.drawn = new Set();
+    this.surrounded = new Set();
+    this.center = new Point(Math.floor(this.width / 2), Math.floor(this.height / 2), this);
+    this.origin = this.center;
+    this.connections = {};
+    this.getDirection = getDirection;
 }
 
-function getRandomCenteredDirection(point) {
-    var toCenter = getDirectionToCenter(point, window.grid.getOrigin());
-    var r = Math.random();
-    if (r < 0.4)
-        return toCenter;
-    else
-        return getTrulyRandomDirection(point);
-}
+Grid.prototype.debug = function(where, msg){
+    var elem = document.getElementById(where);
+    if (elem){
+        if (where == 'news')
+            elem.value = msg + elem.value;    
+        else
+            elem.value = msg;
+    }
+};
 
-function getDirectionToCenter(point, center){
+Grid.prototype.hasDrawn = function (point) {
+    return this.drawn.contains(point);
+};
+
+Grid.prototype.hasSurrounded = function (point) {
+    return this.surrounded.contains(point);
+};
+
+Grid.prototype.getDirectionToCenter = function(){
+    var center = this.center;
+    var point = this.origin;
     if (point.x > center.x){
         if (point.y > center.y)
             return 7;
@@ -47,56 +71,27 @@ function getDirectionToCenter(point, center){
     }
 }
 
-function getTrulyRandomDirection(point) {
-    return Math.floor(Math.random() * 8);
-}
-
-function Grid(canvas, cellSize) {
-    this.canvas = canvas;
-    this.pixelWidth = parseInt(canvas.style.width.replace(/\D/, ''));
-    this.pixelHeight = parseInt(canvas.style.height.replace(/\D/, ''));
-    this.cellSize = cellSize;
-    this.width = Math.floor(this.pixelWidth / cellSize);
-    this.height = Math.floor(this.pixelHeight / cellSize);
-    this.count = 0;
-    this.drawn = new Set();
-    this.surrounded = new Set();
-    this.origin = this.getOrigin();
-    this.connections = {};
-}
-
-Grid.prototype.getOrigin = function(){
-    return new Point(Math.floor(this.width / 2), Math.floor(this.height / 2));
-};
-
-Grid.prototype.hasDrawn = function (point) {
-    return this.drawn.contains(point);
-};
-
-Grid.prototype.hasSurrounded = function (point) {
-    return this.surrounded.contains(point);
-};
 
 Grid.prototype.getNeighboringPoint = function (origin, dir) {
     var x = parseInt(origin.x);
     var y = parseInt(origin.y);
     switch (dir) {
         case 0:
-            return y > 0 ? new Point(x, y - 1) : null;
+            return y > 0 ? new Point(x, y - 1, this) : null;
         case 1:
-            return x < this.width && y > 0 ? new Point(x + 1, y - 1) : null;
+            return x < this.width && y > 0 ? new Point(x + 1, y - 1, this) : null;
         case 2:
-            return x < this.width ? new Point(x + 1, y) : null;
+            return x < this.width ? new Point(x + 1, y, this) : null;
         case 3:
-            return x < this.width && y < this.height ? new Point(x + 1, y + 1) : null;
+            return x < this.width && y < this.height ? new Point(x + 1, y + 1, this) : null;
         case 4:
-            return y < this.height ? new Point(x, y + 1) : null;
+            return y < this.height ? new Point(x, y + 1, this) : null;
         case 5:
-            return x > 0 && y < this.height ? new Point(x - 1, y + 1) : null;
+            return x > 0 && y < this.height ? new Point(x - 1, y + 1, this) : null;
         case 6:
-            return x > 0 ? new Point(x - 1, y) : null;
+            return x > 0 ? new Point(x - 1, y, this) : null;
         case 7:
-            return x > 0 && y > 0 ? new Point(x - 1, y - 1) : null;
+            return x > 0 && y > 0 ? new Point(x - 1, y - 1, this) : null;
     }
 };
 
@@ -110,8 +105,8 @@ Grid.prototype.getOpenNeighboringPoint = function (origin, getStartDirection) {
         if (point && !this.hasDrawn(point) && !this.hasSurrounded(point)){
             var intersects = false;
             if (point && dir % 2 == 1){
-                var intersector1 = this.getNeighboringPoint(origin, dir + 1);
-                var intersector2 = this.getNeighboringPoint(origin, dir - 1);
+                var intersector1 = this.getNeighboringPoint(origin, (dir + 1) % 8);
+                var intersector2 = this.getNeighboringPoint(origin, (dir - 1) % 8);
                 if (intersector1 && intersector2){
                     var conn1 = this.connections[intersector1];
                     var conn2 = this.connections[intersector2];
@@ -122,8 +117,11 @@ Grid.prototype.getOpenNeighboringPoint = function (origin, getStartDirection) {
             if (!intersects){
                 var s = this.hasSurrounded(point) ? 's' : (this.hasDrawn(point) ? 'd' : '');
                 var v = point ? point.toString() + s : ''
-                document.getElementById('p' + ((start + i) % 8)).value = v;
-                toReturn = point;
+                this.debug('p' + ((start + i) % 8), v);
+                toReturn = toReturn || point;
+            }
+            else {
+               this.debug('news', "Rejecting " + point + " for intersection.\n");
             }
         }
     }
@@ -134,18 +132,18 @@ Grid.prototype.getOpenNeighboringPoint = function (origin, getStartDirection) {
 Grid.prototype.markSurrounded = function (point) {
     this.drawn.remove(point);
     this.surrounded.add(point);
-    document.getElementById('surrounded').value = this.surrounded.toString();
-    document.getElementById('drawn').value = this.drawn.toString();
+    this.debug('surrounded', this.surrounded.toString());
+    this.debug('drawn', this.drawn.toString());
 };
 
 Grid.prototype.markDrawn = function (point) {
-    if (this.drawn.contains(point))
+    if (this.drawn.contains(point) || this.surrounded.contains(point))
         return;
 
     this.drawn.add(point);
     this.count++;
-    document.getElementById('drawn').value = this.drawn.toString();
-    document.getElementById('surrounded').value = this.surrounded.toString();
+    this.debug('drawn', this.drawn.toString());
+    this.debug('surrounded', this.surrounded.toString());
 };
 
 Grid.prototype.done = function () {
@@ -194,7 +192,7 @@ Grid.prototype.checkSurrounded = function (point) {
 
     if (surrounded){
         if (!this.surrounded.contains(point))
-            document.getElementById('news').value += point + " is now surrounded.\n";
+            this.debug('news', point + " is now surrounded.\n");
 
         this.markSurrounded(point);
     }
@@ -204,12 +202,12 @@ Grid.prototype.checkSurrounded = function (point) {
 
 Grid.prototype.invalid = function (point) {
     if (this.hasSurrounded(point)){
-        document.getElementById('news').value += this.origin + " is surrounded!\n";
+        this.debug('news', this.origin + " is now surrounded!\n");
         return true;
     }
 
-    if (!this.getOpenNeighboringPoint(point, getRandomDirection)){
-        document.getElementById('news').value += this.origin + " has no open neighbors.\n";
+    if (!this.getOpenNeighboringPoint(point, this.getDirection)){
+        this.debug('news', this.origin + " has no open neighbors.\n");
         return true;
     }
 
@@ -217,7 +215,8 @@ Grid.prototype.invalid = function (point) {
 };
 
 Grid.prototype.getBranchPoint = function(){
-    return new Point(this.drawn.getRandomElement());
+    var xy = this.drawn.getRandomElement().split('/');
+    return new Point(xy[0], xy[1], this);
 //    return new Point(this.drawn.first());
 };
 
@@ -232,37 +231,33 @@ Grid.prototype.draw = function () {
 }
 
 Grid.prototype.drawOne = function() {
-//    while (true) {
-        if (this.done()) {
-            //alert("reached " + this.count);
+    if (this.done()) {
+        //alert("reached " + this.count);
+        return;
+    }
+
+    while (this.invalid(this.origin)) {
+        this.origin = this.getBranchPoint();
+        this.debug('news', "New branch point " + this.origin + ".\n");
+        if (this.origin === null) {
+            alert("No available branch point found.");
             return;
         }
+    }
 
-        while (this.invalid(this.origin)) {
-            this.origin = this.getBranchPoint();
-            document.getElementById('news').value += "New branch point " + this.origin + ".\n";
-            if (this.origin === null) {
-                alert("No available branch point found.");
-                return;
-            }
-        }
+    var dest = this.getOpenNeighboringPoint(this.origin, this.getDirection);
+    this.debug('next', dest ? dest.toString() : 'null');
+    this.debug('current', this.origin ? this.origin.toString() : 'null');
 
-        var dest = this.getOpenNeighboringPoint(this.origin, getRandomDirection);
-        document.getElementById('next').value = dest ? dest.toString() : 'null';
-        document.getElementById('current').value = this.origin ? this.origin.toString() : 'null';
+    if (!dest) {
+        alert("found no valid neighbor for " + this.origin);
+        return;
+    }
 
-        if (!dest) {
-            alert("found no valid neighbor for " + this.origin);
-            return;
-        }
+    this.drawLine(this.origin, dest);
+    this.debug('news', this.origin + ' -> ' + dest + "\n");
 
-        this.drawLine(this.origin, dest);
-        document.getElementById('news').value += this.origin + ' -> ' + dest + "\n";
-        //document.getElementById('news').value = '';
-
-//        this.count++;
-        this.origin = dest;
-//    }
+    this.origin = dest;
 
     setTimeout("window.grid.drawOne()",0);
 };
