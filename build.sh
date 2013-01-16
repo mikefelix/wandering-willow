@@ -1,2 +1,2 @@
-coffee -c spec/*.coffee -o spec-gen
-coffee -c coffee/*.coffee -o js-gen
+coffee -c -o spec-gen spec/*.coffee
+coffee -c -o js-gen coffee/*.coffee
