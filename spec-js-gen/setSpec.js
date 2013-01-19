@@ -4,8 +4,97 @@ describe("Set", function() {
   beforeEach(function() {
     return this.s = new Set();
   });
-  return it('should add elements', function() {
+  it('simple construction', function() {
+    var a, b;
+    a = new Set();
+    a.add('1');
+    b = new Set();
+    return expect(b.contains('1')).toEqual(false);
+  });
+  it('should construct well', function() {
+    this.s = new Set('1', '2', '3');
+    expect(this.s.contains(1)).toEqual(true);
+    expect(this.s.contains(2)).toEqual(true);
+    expect(this.s.contains(3)).toEqual(true);
+    expect(this.s.contains(4)).toEqual(false);
+    return expect(this.s.length()).toEqual(3);
+  });
+  it('should add elements', function() {
     this.s.add(1);
-    return expect(this.s.contains(1)).toEqual(true);
+    expect(this.s.contains(1)).toEqual(true);
+    expect(this.s.contains(2)).toEqual(false);
+    return expect(this.s.length()).toEqual(1);
+  });
+  it('should not duplicate elements', function() {
+    this.s.add(1);
+    this.s.add(1);
+    expect(this.s.contains(1)).toEqual(true);
+    expect(this.s.contains(2)).toEqual(false);
+    return expect(this.s.length()).toEqual(1);
+  });
+  it('should remove elements', function() {
+    this.s.add(1);
+    this.s.add(2);
+    expect(this.s.contains(1)).toEqual(true);
+    expect(this.s.contains(2)).toEqual(true);
+    expect(this.s.length()).toEqual(2);
+    this.s.remove(2);
+    expect(this.s.contains(1)).toEqual(true);
+    expect(this.s.contains(2)).toEqual(false);
+    return expect(this.s.length()).toEqual(1);
+  });
+  it('should return what was added', function() {
+    this.s.add('1');
+    return expect(this.s.first()).toEqual('1');
+  });
+  it('should return a random element', function() {
+    var rand;
+    this.s.add('1');
+    this.s.add('2');
+    this.s.add('3');
+    rand = this.s.findRandomElement();
+    return expect(new Set('1', '2', '3').contains(rand)).toEqual(true);
+  });
+  it('should find elements fitting criteria', function() {
+    var p;
+    this.s.add('1');
+    this.s.add('2');
+    this.s.add('3');
+    expect(this.s.all(function(i) {
+      return parseInt(i) < 4;
+    })).toEqual(true);
+    expect(this.s.any(function(i) {
+      return parseInt(i) < 4;
+    })).toEqual(true);
+    expect(this.s.all(function(i) {
+      return parseInt(i) < 3;
+    })).toEqual(false);
+    expect(this.s.any(function(i) {
+      return parseInt(i) < 3;
+    })).toEqual(true);
+    expect(this.s.any(function(i) {
+      return parseInt(i) > 3;
+    })).toEqual(false);
+    expect(this.s.filter(function(a) {
+      return parseInt(a) < 3;
+    }).contains(2)).toEqual(true);
+    p = this.s.filter(function(a) {
+      return parseInt(a) < 2;
+    });
+    return expect(p.contains(2)).toEqual(false);
+  });
+  return it('should map correctly', function() {
+    var s2;
+    this.s.add(1);
+    this.s.add(300);
+    this.s.add(20);
+    s2 = this.s.map(function(a) {
+      return a * 2;
+    });
+    expect(s2.length()).toEqual(3);
+    expect(s2.contains(2)).toEqual(true);
+    expect(s2.contains(600)).toEqual(true);
+    expect(s2.contains(40)).toEqual(true);
+    return expect(s2.contains(41)).toEqual(false);
   });
 });
