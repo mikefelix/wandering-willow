@@ -1,11 +1,28 @@
 <html> 
     <head>
-        <script type="text/javascript" src="set.js"></script>
-        <script type="text/javascript" src="point.js"></script>
-        <script type="text/javascript" src="directions.js"></script>
-        <script type="text/javascript" src="grid.js"></script>
+        <script type="text/javascript" src="js-gen/set.js"></script>
+        <script type="text/javascript" src="js-gen/point.js"></script>
+        <script type="text/javascript" src="js-gen/directions.js"></script>
+        <script type="text/javascript" src="js-gen/grid.js"></script>
+        <script type="text/javascript">
+            function startGrid(){
+                var c = document.getElementById('canvas');
+                c.width = window.width;
+                c.height = window.height;
+                c.style.width = c.width + 'px';
+                c.style.height = c.height + 'px';
+
+                window.grid = new Grid({
+                    canvas: c,
+                    cellSize: 10,
+                    getDirection: DirectionFunctions.random(.6)
+                });
+
+                window.grid.draw();
+            }
+        </script>
     </head>
-    <body style="overflow:hidden" onload="resizeCanvas();window.grid = new Grid(document.getElementById('canvas'), 10, DirectionFunctions.random(.6));grid.draw();">
+    <body style="overflow:hidden" onload="startGrid();">
         <canvas style="width:1000;height:700" width="1000" height="700" id="canvas"></canvas>
     </body>
 </html>

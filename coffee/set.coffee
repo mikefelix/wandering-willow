@@ -1,9 +1,8 @@
 class Set
-#  elements: {}
   constructor: (elems...) ->
     @elements = {}
-    for i in elems
-      @elements[i] = i
+    e = if elems.length is 1 and typeof elems[0]?.length is 'number' then elems[0] else elems
+    @elements[i] = i for i in e
   contains: (e) -> @elements.hasOwnProperty(e)
   add: (e) -> @elements[e] = e
   remove: (e) -> delete @elements[e]

@@ -12,7 +12,7 @@ Point = (function() {
 
     this.neighborAt = __bind(this.neighborAt, this);
 
-    this.getDirectionTo = __bind(this.getDirectionTo, this);
+    this.directionTo = __bind(this.directionTo, this);
 
     this.openNeighbors = __bind(this.openNeighbors, this);
 
@@ -50,26 +50,34 @@ Point = (function() {
   };
 
   Point.prototype.neighbors = function() {
-    var dir, _i, _results;
-    _results = [];
-    for (dir = _i = 0; _i <= 7; dir = ++_i) {
-      _results.push(neighborAt(dir));
-    }
-    return _results;
+    var dir, r;
+    r = (function() {
+      var _i, _results;
+      _results = [];
+      for (dir = _i = 0; _i <= 7; dir = ++_i) {
+        _results.push(this.neighborAt(dir));
+      }
+      return _results;
+    }).call(this);
+    return new Set(r);
   };
 
   Point.prototype.openNeighbors = function() {
-    var dir, _i, _results;
-    _results = [];
-    for (dir = _i = 0; _i <= 7; dir = ++_i) {
-      if (!neighborAt(dir).drawn()) {
-        _results.push(neighborAt(dir));
+    var dir, r;
+    r = (function() {
+      var _i, _results;
+      _results = [];
+      for (dir = _i = 0; _i <= 7; dir = ++_i) {
+        if (!this.neighborAt(dir).drawn()) {
+          _results.push(this.neighborAt(dir));
+        }
       }
-    }
-    return _results;
+      return _results;
+    }).call(this);
+    return new Set(r);
   };
 
-  Point.prototype.getDirectionTo = function(dest) {
+  Point.prototype.directionTo = function(dest) {
     if (this.x === dest.x && this.y > dest.y) {
       return 0;
     }
@@ -101,43 +109,43 @@ Point = (function() {
     var _base, _base1, _base2, _base3, _base4, _base5, _base6, _base7;
     switch (dir) {
       case 0:
-        if (y > 0) {
-          return (_base = this.neighbors)[0] || (_base[0] = new Point(x, y - 1, this.grid));
+        if (this.y > 0) {
+          return (_base = this.neighbors)[0] || (_base[0] = new Point(this.x, this.y - 1, this.grid));
         }
         break;
       case 1:
-        if (x < grid.width && y > 0) {
-          return (_base1 = this.neighbors)[1] || (_base1[1] = new Point(x + 1, y - 1, this.grid));
+        if (this.x < this.grid.width && this.y > 0) {
+          return (_base1 = this.neighbors)[1] || (_base1[1] = new Point(this.x + 1, this.y - 1, this.grid));
         }
         break;
       case 2:
-        if (x < grid.width) {
-          return (_base2 = this.neighbors)[2] || (_base2[2] = new Point(x + 1, y, this.grid));
+        if (this.x < this.grid.width) {
+          return (_base2 = this.neighbors)[2] || (_base2[2] = new Point(this.x + 1, this.y, this.grid));
         }
         break;
       case 3:
-        if (x < grid.width && y < grid.height) {
-          return (_base3 = this.neighbors)[3] || (_base3[3] = new Point(x + 1, y + 1, this.grid));
+        if (this.x < this.grid.width && this.y < this.grid.height) {
+          return (_base3 = this.neighbors)[3] || (_base3[3] = new Point(this.x + 1, this.y + 1, this.grid));
         }
         break;
       case 4:
-        if (y < grid.height) {
-          return (_base4 = this.neighbors)[4] || (_base4[4] = new Point(x, y + 1, this.grid));
+        if (this.y < this.grid.height) {
+          return (_base4 = this.neighbors)[4] || (_base4[4] = new Point(this.x, this.y + 1, this.grid));
         }
         break;
       case 5:
-        if (x > 0 && y < grid.height) {
-          return (_base5 = this.neighbors)[5] || (_base5[5] = new Point(x - 1, y + 1, this.grid));
+        if (this.x > 0 && this.y < this.grid.height) {
+          return (_base5 = this.neighbors)[5] || (_base5[5] = new Point(this.x - 1, this.y + 1, this.grid));
         }
         break;
       case 6:
-        if (x > 0) {
-          return (_base6 = this.neighbors)[6] || (_base6[6] = new Point(x - 1, y, this.grid));
+        if (this.x > 0) {
+          return (_base6 = this.neighbors)[6] || (_base6[6] = new Point(this.x - 1, this.y, this.grid));
         }
         break;
       case 7:
-        if (x > 0 && y > 0) {
-          return (_base7 = this.neighbors)[7] || (_base7[7] = new Point(x - 1, y - 1, this.grid));
+        if (this.x > 0 && this.y > 0) {
+          return (_base7 = this.neighbors)[7] || (_base7[7] = new Point(this.x - 1, this.y - 1, this.grid));
         }
     }
     return null;

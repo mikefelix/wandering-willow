@@ -4,8 +4,10 @@ describe("Set", function() {
   beforeEach(function() {
     return this.s = new Set();
   });
-  it('simple construction', function() {
+  it('construct', function() {
     var a, b;
+    expect(new Set(1, 2, 3, 4).length()).toEqual(4);
+    expect(new Set([1, 2, 3]).length()).toEqual(3);
     a = new Set();
     a.add('1');
     b = new Set();

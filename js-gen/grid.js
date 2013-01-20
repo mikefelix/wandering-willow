@@ -4,10 +4,7 @@ var Grid,
 
 Grid = (function() {
 
-  function Grid(canvas, cellSize, getDirection) {
-    this.canvas = canvas;
-    this.cellSize = cellSize;
-    this.getDirection = getDirection != null ? getDirection : DirectionFunctions.random();
+  function Grid(opts) {
     this.drawOne = __bind(this.drawOne, this);
 
     this.draw = __bind(this.draw, this);
@@ -29,19 +26,15 @@ Grid = (function() {
     this.hasSurrounded = __bind(this.hasSurrounded, this);
 
     this.hasDrawn = __bind(this.hasDrawn, this);
-
-    this.windowHeight = window.innerHeight;
-    this.windowWidth = window.innerWidth;
-    this.canvas.width = this.canvas.style.width = windowWidth;
-    this.canvas.height = this.canvas.style.height = windowHeight;
-    this.pixelWidth = parseInt(this.canvas.style.width.replace(/\D/, ''));
-    this.pixelHeight = parseInt(this.canvas.style.height.replace(/\D/, ''));
+    this.canvas = opts['canvas'];
+    this.cellSize = opts['cellSize'];
+    this.getDirection = opts['getDirection'];
+    this.width = Math.floor(this.canvas.width / this.cellSize);
+    this.height = Math.floor(this.canvas.height / this.cellSize);
     this.center = new Point(Math.floor(this.width / 2), Math.floor(this.height / 2), this);
-    this.width = Math.floor(this.pixelWidth / this.cellSize);
-    this.height = Math.floor(this.pixelHeight / this.cellSize);
-    this.count = 0;
     this.drawn = new Set();
     this.surrounded = new Set();
+    this.count = 0;
   }
 
   Grid.prototype.hasDrawn = function(point) {

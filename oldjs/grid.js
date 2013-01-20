@@ -42,7 +42,7 @@ Grid.prototype.hasSurrounded = function (point) {
     return this.surrounded.contains(point);
 };
 
-Grid.prototype.getDirectionToCenter = function(){
+Grid.prototype.directionToCenter = function(){
     var center = this.center;
     var point = this.origin;
     if (point.x > center.x){

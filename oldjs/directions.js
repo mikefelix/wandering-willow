@@ -11,7 +11,7 @@ var DirectionFunctions = {
     },
     trendToCenter: function(weight){
         return function(point, grid){
-            return Math.random() < weight ? window.grid.getDirectionToCenter() : Math.floor(Math.random() * 8);
+            return Math.random() < weight ? window.grid.directionToCenter() : Math.floor(Math.random() * 8);
         };
     },
     star: function(weight){

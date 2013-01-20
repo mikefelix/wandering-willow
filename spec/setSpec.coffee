@@ -2,7 +2,9 @@ describe "Set", ->
   beforeEach ->
     @s = new Set()
 
-  it 'simple construction', ->
+  it 'construct', ->
+    expect(new Set(1,2,3,4).length()).toEqual 4
+    expect(new Set([1,2,3]).length()).toEqual 3
     a = new Set()
     a.add '1'
     b = new Set()

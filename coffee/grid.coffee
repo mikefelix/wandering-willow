@@ -1,17 +1,14 @@
 class Grid
-  constructor: (@canvas, @cellSize, @getDirection = DirectionFunctions.random()) ->
-    @windowHeight = window.innerHeight
-    @windowWidth = window.innerWidth
-    @canvas.width = @canvas.style.width = windowWidth
-    @canvas.height = @canvas.style.height = windowHeight
-    @pixelWidth = parseInt(@canvas.style.width.replace(/\D/, ''))
-    @pixelHeight = parseInt(@canvas.style.height.replace(/\D/, ''))
-    @center = new Point(Math.floor(this.width / 2), Math.floor(this.height / 2), this)
-    @width = Math.floor(@pixelWidth / @cellSize)
-    @height = Math.floor(@pixelHeight / @cellSize)
-    @count = 0
+  constructor: (opts) ->
+    @canvas = opts['canvas']
+    @cellSize = opts['cellSize']
+    @getDirection = opts['getDirection']
+    @width = Math.floor(@canvas.width / @cellSize)
+    @height = Math.floor(@canvas.height / @cellSize)
+    @center = new Point(Math.floor(@width / 2), Math.floor(@height / 2), this)
     @drawn = new Set()
     @surrounded = new Set()
+    @count = 0
 
   hasDrawn: (point) => not point? or @drawn.contains point
   hasSurrounded: (point) => @surrounded.contains point

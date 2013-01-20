@@ -19,7 +19,7 @@ DirectionFunctions = {
   trendToCenter: function(weight) {
     return function(point, grid) {
       if (Math.random() < weight) {
-        return point.getDirectionTo(grid.center);
+        return point.directionTo(grid.center);
       } else {
         return Math.floor(Math.random() * 8);
       }
