@@ -9,6 +9,8 @@ Grid = (function() {
 
     this.draw = __bind(this.draw, this);
 
+    this.init = __bind(this.init, this);
+
     this.checkSurrounded = __bind(this.checkSurrounded, this);
 
     this.drawLine = __bind(this.drawLine, this);
@@ -35,14 +37,15 @@ Grid = (function() {
     this.drawn = new Set();
     this.surrounded = new Set();
     this.count = 0;
+    this.init();
   }
 
   Grid.prototype.hasDrawn = function(point) {
-    return !(point != null) || this.drawn.contains(point);
+    return (point != null) && this.drawn.contains(point);
   };
 
   Grid.prototype.hasSurrounded = function(point) {
-    return this.surrounded.contains(point);
+    return (point != null) && this.surrounded.contains(point);
   };
 
   Grid.prototype.findBranchPoint = function() {
@@ -64,21 +67,19 @@ Grid = (function() {
   };
 
   Grid.prototype.markSurrounded = function(point) {
-    if (!this.surrounded.contains(point)) {
-      this.drawn.remove(point);
-      return this.surrounded.add(point);
-    }
+    this.drawn.remove(point);
+    return this.surrounded.add(point);
   };
 
   Grid.prototype.markDrawn = function(point) {
-    if (!this.drawn.contains(point) && !this.surrounded.contains(point)) {
+    if (!this.hasDrawn(point) && !this.hasSurrounded(point)) {
       this.drawn.add(point);
       return this.count += 1;
     }
   };
 
   Grid.prototype.drawLine = function(origin, dest) {
-    var n, _i, _len, _ref, _results;
+    var _this = this;
     this.c.beginPath();
     this.c.moveTo(origin.realX, origin.realY);
     this.c.lineTo(dest.realX, dest.realY);
@@ -89,44 +90,42 @@ Grid = (function() {
     this.markDrawn(dest);
     origin.connections.add(dest);
     this.checkSurrounded(dest);
-    _ref = dest.neighbors();
-    _results = [];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      n = _ref[_i];
-      _results.push(this.checkSurrounded(n));
-    }
-    return _results;
+    return dest.neighbors().each(function(n) {
+      return _this.checkSurrounded(n);
+    });
   };
 
   Grid.prototype.checkSurrounded = function(point) {
-    if ((point != null ? point.drawn() : void 0) && !point.surrounded()) {
-      if (point.neighbors().any(function(p) {
-        return !this.hasDrawn(p);
-      })) {
-        return this.markSurrounded(point);
-      }
+    if (this.hasDrawn(point) && !this.hasSurrounded(point) && point.openNeighbors().length() === 0) {
+      return this.markSurrounded(point);
     }
   };
 
-  Grid.prototype.draw = function() {
+  Grid.prototype.init = function() {
     this.c = this.canvas.getContext('2d');
     this.c.lineWidth = 1;
     this.c.strokeStyle = 'black';
     this.origin = this.center;
-    this.markDrawn(this.origin);
+    return this.markDrawn(this.origin);
+  };
+
+  Grid.prototype.draw = function() {
+    this.init();
     return this.drawOne();
   };
 
   Grid.prototype.drawOne = function() {
     var dest, _ref;
     if (this.done()) {
-      return 'Finished!';
+      alert("Finished!");
+      return;
     }
     while (!((_ref = this.origin) != null ? _ref.branchable() : void 0)) {
       this.origin = this.findBranchPoint();
     }
     dest = this.origin.findOpenNeighbor(this.getDirection);
     if (!(dest != null)) {
+      alert("No dest found!");
       return;
     }
     this.drawLine(this.origin, dest);

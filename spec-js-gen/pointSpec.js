@@ -2,14 +2,27 @@
 
 describe("Point", function() {
   beforeEach(function() {
-    var g;
+    var canvas, context, g;
+    context = {
+      lineWidth: 10,
+      strokeStyle: '',
+      beginPath: function() {},
+      moveTo: function(x, y) {},
+      lineTo: function(x, y) {},
+      closePath: function() {},
+      stroke: function() {}
+    };
+    canvas = {
+      width: 100,
+      height: 100,
+      getContext: function() {
+        return context;
+      }
+    };
     g = new Grid({
-      canvas: {
-        width: 500,
-        height: 500
-      },
+      canvas: canvas,
       cellSize: 10,
-      getDirection: DirectionFunctions.random(0.6)
+      getDirection: DirectionFunctions.random()
     });
     this.p33 = new Point(3, 3, g);
     this.p34 = new Point(3, 4, g);

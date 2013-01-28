@@ -9,9 +9,11 @@ class Grid
     @drawn = new Set()
     @surrounded = new Set()
     @count = 0
+    @init()
 
-  hasDrawn: (point) => not point? or @drawn.contains point
-  hasSurrounded: (point) => @surrounded.contains point
+  hasDrawn: (point) => point? and @drawn.contains point
+
+  hasSurrounded: (point) => point? and @surrounded.contains point
   findBranchPoint: => @drawn.randomElement()
   done: => @count >= (@width + 1) * (@height + 1)
 
@@ -22,16 +24,16 @@ class Grid
     elem.value += v + msg
 
   markSurrounded: (point) =>
-    if not @surrounded.contains point
-      @drawn.remove point
-      @surrounded.add point
+    @drawn.remove point
+    @surrounded.add point
 
   markDrawn: (point) =>
-    if not @drawn.contains(point) and not @surrounded.contains(point)
+    if not @hasDrawn(point) and not @hasSurrounded(point)
       @drawn.add point
       @count += 1
 
   drawLine: (origin, dest) =>
+#    alert "Drawing from " + origin + " to " + dest
     @c.beginPath()
     @c.moveTo origin.realX, origin.realY
     @c.lineTo dest.realX, dest.realY
@@ -41,31 +43,32 @@ class Grid
     @markDrawn origin
     @markDrawn dest
     origin.connections.add dest
-#    @checkSurrounded origin
-#    for n in origin.neighbors()
-#      @checkSurrounded n
     @checkSurrounded dest
-    for n in dest.neighbors()
-      @checkSurrounded n
+    dest.neighbors().each (n) => @checkSurrounded n
 
   checkSurrounded: (point) =>
-    if point?.drawn() and not point.surrounded()
-      if point.neighbors().any((p) -> not @hasDrawn p)
-        @markSurrounded point
+    @markSurrounded(point) if @hasDrawn(point) and not @hasSurrounded(point) and point.openNeighbors().length() is 0
 
-  draw: =>
+  init: =>
     @c = @canvas.getContext('2d')
     @c.lineWidth = 1
     @c.strokeStyle = 'black'
     @origin = @center
     @markDrawn @origin
+
+  draw: =>
+    @init()
     @drawOne()
 
   drawOne: =>
-    return 'Finished!' if @done()
+    if @done()
+      alert "Finished!"
+      return
     @origin = @findBranchPoint() until @origin?.branchable()
     dest = @origin.findOpenNeighbor @getDirection
-    return if !dest?
+    if !dest?
+      alert "No dest found!"
+      return
     @drawLine @origin, dest
     @origin = dest
     setTimeout @drawOne, 0

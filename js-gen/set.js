@@ -35,6 +35,21 @@ Set = (function() {
     }
   };
 
+  Set.prototype.length = function() {
+    return Object.keys(this.elements).length;
+  };
+
+  Set.prototype.each = function(f) {
+    var item, _ref, _results;
+    _ref = this.elements;
+    _results = [];
+    for (item in _ref) {
+      if (!__hasProp.call(_ref, item)) continue;
+      _results.push(f(this.elements[item]));
+    }
+    return _results;
+  };
+
   Set.prototype.any = function(f) {
     var item, _ref;
     _ref = this.elements;
@@ -81,10 +96,6 @@ Set = (function() {
       r.add(f(this.elements[item]));
     }
     return r;
-  };
-
-  Set.prototype.length = function() {
-    return Object.keys(this.elements).length;
   };
 
   Set.prototype.findRandomElement = function() {

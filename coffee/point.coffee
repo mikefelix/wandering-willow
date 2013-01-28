@@ -7,15 +7,16 @@ class Point
     @connections = new Set()
 
   toString: => @x + '/' + @y
-  drawn: => @grid.hasDrawn this
-  surrounded: => @grid.hasSurrounded this
-  branchable: => not @surrounded()
-  neighbors: =>
-    r = (@neighborAt(dir) for dir in [0..7])
-    new Set(r)
+#  drawn: => @grid.hasDrawn this
+#  surrounded: => @grid.hasSurrounded this
+  branchable: => not @grid.hasSurrounded(this)
+  neighbors: => new Set(@neighborAt(dir) for dir in [0..7])
+#  openNeighbors: => new Set(@neighborAt(dir) for dir in [0..7] when not @grid.hasDrawn(@neighborAt(dir)))
   openNeighbors: =>
-    r = (@neighborAt(dir) for dir in [0..7] when not @neighborAt(dir).drawn())
-    new Set(r)
+    new Set(
+      @neighbors().filter (p) =>
+        not @grid.hasDrawn(p) and not @grid.hasSurrounded(p) and not @wouldIntersect(p)
+    )
 
   directionTo: (dest) =>
     return 0 if @x is dest.x and @y > dest.y
@@ -40,18 +41,20 @@ class Point
       when 7 then return @neighbors[7] or= new Point(@x - 1, @y - 1, @grid) if @x > 0 and @y > 0
     null
 
-  wouldIntersect: (dest, dir) =>
+  wouldIntersect: (dest, dir = null) =>
+    dir = @directionTo(dest) if not dir?
     return false if dir % 2 != 1
     intersector1 = @neighborAt((dir + 1) % 8)
     intersector2 = @neighborAt((dir - 1) % 8)
-    intersector1.connections.contains(intersector2) or intersector2.connections.contains(intersector1)
+    intersector1?.connections.contains(intersector2) or intersector2?.connections.contains(intersector1)
 
   findOpenNeighbor: (getStartDirection) =>
-    return null if @surrounded()
+    return null if @grid.hasSurrounded(this)
     start = getStartDirection this
     for i in [0..7]
       dir = (start + i) % 8
       point = @neighborAt dir
       return point if point? and not @wouldIntersect(point, dir)
+    null
 
 

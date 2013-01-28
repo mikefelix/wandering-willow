@@ -7,14 +7,14 @@
         <script type="text/javascript">
             function startGrid(){
                 var c = document.getElementById('canvas');
-                c.width = window.width;
-                c.height = window.height;
+                c.width = window.innerWidth;
+                c.height = window.innerHeight;
                 c.style.width = c.width + 'px';
                 c.style.height = c.height + 'px';
 
                 window.grid = new Grid({
                     canvas: c,
-                    cellSize: 10,
+                    cellSize: 30,
                     getDirection: DirectionFunctions.random(.6)
                 });
 

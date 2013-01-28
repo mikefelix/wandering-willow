@@ -1,9 +1,21 @@
 describe "Point", ->
   beforeEach ->
+    context =
+      lineWidth: 10
+      strokeStyle: ''
+      beginPath: ->
+      moveTo: (x,y) ->
+      lineTo: (x,y) ->
+      closePath: ->
+      stroke: ->
+    canvas =
+      width: 100
+      height: 100
+      getContext: -> context
     g = new Grid
-      canvas: { width: 500, height: 500 }
+      canvas: canvas
       cellSize: 10
-      getDirection: DirectionFunctions.random(0.6)
+      getDirection: DirectionFunctions.random()
     @p33 = new Point(3, 3, g)
     @p34 = new Point(3, 4, g)
     @p35 = new Point(3, 5, g)

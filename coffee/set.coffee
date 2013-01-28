@@ -7,6 +7,10 @@ class Set
   add: (e) -> @elements[e] = e
   remove: (e) -> delete @elements[e]
   first: -> return @elements[e] for e of @elements
+  length: -> Object.keys(@elements).length
+  each: (f) ->
+    for own item of @elements
+      f(@elements[item])
   any: (f) ->
     for own item of @elements
       return true if f @elements[item]
@@ -26,11 +30,6 @@ class Set
     for own item of @elements
       r.add f(@elements[item])
     r
-  length: -> Object.keys(@elements).length
-#    i = 0
-#    for own o of @elements
-#      i++
-#    i
   findRandomElement: ->
     idx = Math.floor(Math.random() * Object.keys(@elements).length)
     i = 0
