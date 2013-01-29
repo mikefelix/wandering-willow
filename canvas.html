@@ -7,23 +7,25 @@
         <script type="text/javascript">
             function startGrid(){
                 var c = document.getElementById('canvas');
-                c.width = window.innerWidth - 6;
-                c.height = window.innerHeight - 6;
+                c.width = window.innerWidth - 16;
+                c.height = window.innerHeight - 16;
                 c.style.width = c.width + 'px';
                 c.style.height = c.height + 'px';
 
                 window.grid = new Grid({
                     canvas: c,
-                    cellSize: 20,
-                    getDirection: DirectionFunctions.random(.6)
+                    strokeStyle: 'white',
+                    cellSize: 10,
+                    getDirection: DirectionFunctions.trendToCenter(.3),
+                    //getBranchPoint: BranchFunctions.fromStart()
+                    getBranchPoint: BranchFunctions.random()
                 });
 
                 window.grid.draw();
             }
         </script>
     </head>
-    <body style="overflow:hidden" onload="startGrid();">
-        <!--<canvas style="width:1000;height:700" width="1000" height="700" id="canvas" onclick="window.grid.drawOne()"></canvas>-->
-        <canvas style="width:1000;height:700" width="1000" height="700" id="canvas"></canvas>
+    <body style="background:black;overflow:hidden" onload="startGrid();">
+        <canvas style="width:1000px;height:700px" width="1000" height="700" id="canvas"></canvas>
     </body>
 </html>

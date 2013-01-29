@@ -25,8 +25,6 @@ Grid = (function() {
 
     this.done = __bind(this.done, this);
 
-    this.findBranchPoint = __bind(this.findBranchPoint, this);
-
     this.hasSurrounded = __bind(this.hasSurrounded, this);
 
     this.hasDrawn = __bind(this.hasDrawn, this);
@@ -35,6 +33,8 @@ Grid = (function() {
     this.canvas = opts['canvas'];
     this.cellSize = opts['cellSize'];
     this.getDirection = opts['getDirection'];
+    this.getBranchPoint = opts['getBranchPoint'];
+    this.strokeStyle = opts['strokeStyle'];
     this.drawn = new Set();
     this.surrounded = new Set();
     this.points = {};
@@ -43,7 +43,6 @@ Grid = (function() {
     this.height = Math.floor(this.canvas.height / this.cellSize);
     this.center = this.point(Math.floor(this.width / 2), Math.floor(this.height / 2));
     this.init();
-    this.triggered = false;
   }
 
   Grid.prototype.point = function(x, y) {
@@ -57,10 +56,6 @@ Grid = (function() {
 
   Grid.prototype.hasSurrounded = function(point) {
     return (point != null) && this.surrounded.contains(point);
-  };
-
-  Grid.prototype.findBranchPoint = function() {
-    return this.drawn.randomElement();
   };
 
   Grid.prototype.done = function() {
@@ -135,10 +130,6 @@ Grid = (function() {
   };
 
   Grid.prototype.checkSurrounded = function(point) {
-    var a;
-    if (this.triggered) {
-      a = 1;
-    }
     if (this.hasDrawn(point) && !this.hasSurrounded(point) && point.openNeighbors().length() === 0) {
       return this.markSurrounded(point);
     }
@@ -147,7 +138,7 @@ Grid = (function() {
   Grid.prototype.init = function() {
     this.c = this.canvas.getContext('2d');
     this.c.lineWidth = 1;
-    this.c.strokeStyle = 'black';
+    this.c.strokeStyle = this.strokeStyle;
     this.origin = this.center;
     return this.markDrawn(this.origin);
   };
@@ -160,12 +151,11 @@ Grid = (function() {
   Grid.prototype.drawOne = function() {
     var dest, _ref;
     if (this.done()) {
-      alert("Finished!");
       return;
     }
     dest = null;
     while (!((_ref = this.origin) != null ? _ref.branchable() : void 0)) {
-      this.origin = this.findBranchPoint();
+      this.origin = this.getBranchPoint(this);
       if (!(this.origin != null)) {
         alert("Can't find branch point.");
         return;

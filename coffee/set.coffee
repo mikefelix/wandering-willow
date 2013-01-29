@@ -1,8 +1,12 @@
 class Set
   constructor: (elems...) ->
     @elements = {}
-    e = if elems.length is 1 and typeof elems[0]?.length is 'number' then elems[0] else elems
-    @elements[i] = i for i in e
+    @order = []
+    @orderIdx = 0
+    initial = if elems.length is 1 and typeof elems[0]?.length is 'number' then elems[0] else elems
+    for i in initial
+      @elements[i] = i
+      @order[@orderIdx++] = '' + i
   contains: (e) -> @elements.hasOwnProperty(e)
   add: (e) -> @elements[e] = e
   remove: (e) -> delete @elements[e]

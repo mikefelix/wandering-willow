@@ -50,7 +50,7 @@ describe "Set", ->
     @s.add '1'
     @s.add '2'
     @s.add '3'
-    rand = @s.findRandomElement()
+    rand = @s.randomElement()
     expect(new Set('1', '2', '3').contains(rand)).toEqual true
 
   it 'should find elements fitting criteria', ->

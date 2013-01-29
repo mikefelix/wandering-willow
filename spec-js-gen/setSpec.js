@@ -54,7 +54,7 @@ describe("Set", function() {
     this.s.add('1');
     this.s.add('2');
     this.s.add('3');
-    rand = this.s.findRandomElement();
+    rand = this.s.randomElement();
     return expect(new Set('1', '2', '3').contains(rand)).toEqual(true);
   });
   it('should find elements fitting criteria', function() {

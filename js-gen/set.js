@@ -6,13 +6,16 @@ var Set,
 Set = (function() {
 
   function Set() {
-    var e, elems, i, _i, _len, _ref;
+    var elems, i, initial, _i, _len, _ref;
     elems = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
     this.elements = {};
-    e = elems.length === 1 && typeof ((_ref = elems[0]) != null ? _ref.length : void 0) === 'number' ? elems[0] : elems;
-    for (_i = 0, _len = e.length; _i < _len; _i++) {
-      i = e[_i];
+    this.order = [];
+    this.orderIdx = 0;
+    initial = elems.length === 1 && typeof ((_ref = elems[0]) != null ? _ref.length : void 0) === 'number' ? elems[0] : elems;
+    for (_i = 0, _len = initial.length; _i < _len; _i++) {
+      i = initial[_i];
       this.elements[i] = i;
+      this.order[this.orderIdx++] = '' + i;
     }
   }
 

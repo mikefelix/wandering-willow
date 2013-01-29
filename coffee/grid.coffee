@@ -3,6 +3,8 @@ class Grid
     @canvas = opts['canvas']
     @cellSize = opts['cellSize']
     @getDirection = opts['getDirection']
+    @getBranchPoint = opts['getBranchPoint']
+    @strokeStyle = opts['strokeStyle']
     @drawn = new Set()
     @surrounded = new Set()
     @points = {}
@@ -11,12 +13,10 @@ class Grid
     @height = Math.floor(@canvas.height / @cellSize)
     @center = @point(Math.floor(@width / 2), Math.floor(@height / 2))
     @init()
-    @triggered = false
 
   point: (x,y) => @points[x + '/' + y] or= new Point(x, y, this)
   hasDrawn: (point) => point? and @drawn.contains point
   hasSurrounded: (point) => point? and @surrounded.contains point
-  findBranchPoint: => @drawn.randomElement()
   done: => @count >= (@width + 1) * (@height + 1)
 
   debug: (where, msg) =>
@@ -61,13 +61,12 @@ class Grid
     dest.neighbors().each (n) => @checkSurrounded n
 
   checkSurrounded: (point) =>
-    a = 1 if @triggered
     @markSurrounded(point) if @hasDrawn(point) and not @hasSurrounded(point) and point.openNeighbors().length() is 0
 
   init: =>
     @c = @canvas.getContext('2d')
     @c.lineWidth = 1
-    @c.strokeStyle = 'black'
+    @c.strokeStyle = @strokeStyle
     @origin = @center
     @markDrawn @origin
 
@@ -76,12 +75,10 @@ class Grid
     @drawOne()
 
   drawOne: =>
-    if @done()
-      alert "Finished!"
-      return
+    return if @done()
     dest = null
     while not @origin?.branchable()
-      @origin = @findBranchPoint()
+      @origin = @getBranchPoint(this)
       if not @origin?
         alert "Can't find branch point."
         return

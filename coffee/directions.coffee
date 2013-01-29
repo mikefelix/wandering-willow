@@ -9,3 +9,9 @@ DirectionFunctions =
     (point, grid) -> Math.random() * 8
   bounce: (startDir, weight) ->
     (point, grid) -> Math.random() * 8
+
+BranchFunctions =
+  random: ->
+    (grid) -> grid.drawn.randomElement()
+  fromStart: ->
+    (grid) -> grid.drawn.first()
