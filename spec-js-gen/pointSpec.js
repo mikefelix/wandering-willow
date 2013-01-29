@@ -24,15 +24,15 @@ describe("Point", function() {
       cellSize: 10,
       getDirection: DirectionFunctions.random()
     });
-    this.p33 = new Point(3, 3, g);
-    this.p34 = new Point(3, 4, g);
-    this.p35 = new Point(3, 5, g);
-    this.p43 = new Point(4, 3, g);
-    this.p44 = new Point(4, 4, g);
-    this.p45 = new Point(4, 5, g);
-    this.p53 = new Point(5, 3, g);
-    this.p54 = new Point(5, 4, g);
-    return this.p55 = new Point(5, 5, g);
+    this.p33 = g.point(3, 3);
+    this.p34 = g.point(3, 4);
+    this.p35 = g.point(3, 5);
+    this.p43 = g.point(4, 3);
+    this.p44 = g.point(4, 4);
+    this.p45 = g.point(4, 5);
+    this.p53 = g.point(5, 3);
+    this.p54 = g.point(5, 4);
+    return this.p55 = g.point(5, 5);
   });
   it('toStrings', function() {
     return expect(this.p33.toString()).toEqual('3/3');

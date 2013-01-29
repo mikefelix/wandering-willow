@@ -5,7 +5,7 @@ drawAndCheck = function(grid, from, to, expectDrawn, expectSurrounded, block) {
   if (block == null) {
     block = null;
   }
-  grid.drawLine(new Point(from[0], from[1], grid), new Point(to[0], to[1], grid));
+  grid.drawLine(from, to);
   expect(grid.drawn.length()).toEqual(expectDrawn);
   expect(grid.surrounded.length()).toEqual(expectSurrounded);
   if (block != null) {
@@ -39,35 +39,52 @@ describe("Grid", function() {
       getDirection: DirectionFunctions.random()
     });
   });
-  it('can surround cells', function() {
-    var _this = this;
-    this.g.drawn.add(new Point(5, 5, this.g));
-    this.g.drawn.add(new Point(5, 6, this.g));
-    this.g.drawn.add(new Point(6, 6, this.g));
-    this.g.drawn.add(new Point(6, 5, this.g));
-    this.g.drawn.add(new Point(6, 4, this.g));
-    this.g.drawn.add(new Point(5, 4, this.g));
-    this.g.drawn.add(new Point(4, 4, this.g));
-    this.g.drawn.add(new Point(4, 5, this.g));
-    this.g.checkSurrounded(new Point(5, 5, this.g));
-    expect(this.g.hasSurrounded(new Point(5, 5, this.g))).toEqual(false);
-    this.g.drawn.add(new Point(4, 6, this.g));
-    expect(new Point(5, 5, this.g).neighbors().all(function(p) {
-      return _this.g.hasDrawn(p);
-    })).toEqual(true);
-    this.g.checkSurrounded(new Point(5, 5, this.g));
-    return expect(this.g.hasSurrounded(new Point(5, 5, this.g))).toEqual(true);
+  it('always finds the only open neighbor', function() {
+    var i, o, _i, _results;
+    this.g.drawn.add(this.g.point(5, 5));
+    this.g.drawn.add(this.g.point(5, 4));
+    this.g.drawn.add(this.g.point(6, 6));
+    this.g.drawn.add(this.g.point(6, 5));
+    this.g.drawn.add(this.g.point(6, 4));
+    this.g.drawn.add(this.g.point(4, 6));
+    this.g.drawn.add(this.g.point(4, 5));
+    this.g.drawn.add(this.g.point(4, 4));
+    o = this.g.findOpenNeighbor([5, 5]);
+    expect(o.toString()).toEqual('5/6');
+    _results = [];
+    for (i = _i = 0; _i <= 7; i = ++_i) {
+      _results.push(expect(this.g.findOpenNeighbor([5, 5]).toString()).toEqual(o.toString()));
+    }
+    return _results;
+  });
+  it('always finds the only open neighbor on edges', function() {
+    var i, o, _i, _results;
+    this.g.drawn.add(this.g.point(1, 1));
+    this.g.drawn.add(this.g.point(1, 0));
+    this.g.drawn.add(this.g.point(0, 1));
+    this.g.drawn.add(this.g.point(2, 0));
+    this.g.drawn.add(this.g.point(2, 1));
+    this.g.drawn.add(this.g.point(2, 2));
+    this.g.drawn.add(this.g.point(1, 2));
+    this.g.drawn.add(this.g.point(0, 2));
+    o = this.g.findOpenNeighbor([1, 1]);
+    expect(o.toString()).toEqual('0/0');
+    _results = [];
+    for (i = _i = 0; _i <= 7; i = ++_i) {
+      _results.push(expect(this.g.findOpenNeighbor([1, 1]).toString()).toEqual(o.toString()));
+    }
+    return _results;
   });
   it('detects intersection', function() {
-    expect(this.g.origin.toString()).toEqual(new Point(5, 5, this.g).toString());
+    expect(this.g.origin.toString()).toEqual(this.g.point(5, 5).toString());
     drawAndCheck(this.g, [5, 5], [6, 6], 2, 0);
     drawAndCheck(this.g, [6, 6], [6, 5], 3, 0);
-    expect(new Point(6, 5, this.g).wouldIntersect(new Point(5, 6, this.g))).toEqual(true);
-    return expect(new Point(6, 5, this.g).wouldIntersect(new Point(7, 5, this.g))).toEqual(false);
+    expect(this.g.point(6, 5).wouldIntersect(this.g.point(5, 6))).toEqual(true);
+    return expect(this.g.point(6, 5).wouldIntersect(this.g.point(7, 5))).toEqual(false);
   });
   it('keeps track of drawn cells', function() {
     var _this = this;
-    expect(this.g.origin.toString()).toEqual(new Point(5, 5, this.g).toString());
+    expect(this.g.origin.toString()).toEqual(this.g.point(5, 5).toString());
     drawAndCheck(this.g, [5, 5], [5, 6], 2, 0);
     drawAndCheck(this.g, [5, 6], [6, 6], 3, 0);
     drawAndCheck(this.g, [6, 6], [6, 5], 4, 0);
@@ -76,8 +93,28 @@ describe("Grid", function() {
     drawAndCheck(this.g, [5, 4], [4, 4], 7, 0);
     drawAndCheck(this.g, [4, 4], [4, 5], 8, 0);
     return drawAndCheck(this.g, [4, 5], [4, 6], 8, 1, function() {
-      return _this.g.surrounded.contains(new Point(5, 5, _this.g));
+      return _this.g.surrounded.contains(_this.g.point(5, 5));
     });
+  });
+  it('can surround cells', function() {
+    var _this = this;
+    this.g.drawn.add(this.g.point(5, 5));
+    this.g.drawn.add(this.g.point(5, 6));
+    this.g.drawn.add(this.g.point(6, 6));
+    this.g.drawn.add(this.g.point(6, 5));
+    this.g.drawn.add(this.g.point(6, 4));
+    this.g.drawn.add(this.g.point(5, 4));
+    this.g.drawn.add(this.g.point(4, 4));
+    this.g.drawn.add(this.g.point(4, 5));
+    this.g.checkSurrounded(this.g.point(5, 5));
+    expect(this.g.hasSurrounded(this.g.point(5, 5))).toEqual(false);
+    this.g.drawn.add(this.g.point(4, 6));
+    expect(this.g.point(5, 5, this.g).neighbors().all(function(p) {
+      return _this.g.hasDrawn(p);
+    })).toEqual(true);
+    this.g.triggered = true;
+    this.g.checkSurrounded(this.g.point(5, 5));
+    return expect(this.g.hasSurrounded(this.g.point(5, 5))).toEqual(true);
   });
   return it("doesn't overlap lines", function() {
     var p,
@@ -88,7 +125,7 @@ describe("Grid", function() {
     p = drawAndCheck(this.g, p, [6, 6], 4, 0);
     p = drawAndCheck(this.g, p, [6, 5], 5, 0);
     return p = drawAndCheck(this.g, p, [5, 6], 5, 1, function() {
-      return _this.g.surrounded.contains(new Point(5, 6, _this.g));
+      return _this.g.surrounded.contains(_this.g.point(5, 6));
     });
   });
 });

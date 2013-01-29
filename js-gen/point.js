@@ -6,8 +6,6 @@ Point = (function() {
 
   function Point(x, y, grid) {
     this.grid = grid;
-    this.findOpenNeighbor = __bind(this.findOpenNeighbor, this);
-
     this.wouldIntersect = __bind(this.wouldIntersect, this);
 
     this.neighborAt = __bind(this.neighborAt, this);
@@ -15,6 +13,8 @@ Point = (function() {
     this.directionTo = __bind(this.directionTo, this);
 
     this.openNeighbors = __bind(this.openNeighbors, this);
+
+    this.neighborIsOpen = __bind(this.neighborIsOpen, this);
 
     this.neighbors = __bind(this.neighbors, this);
 
@@ -49,14 +49,21 @@ Point = (function() {
     }).call(this));
   };
 
+  Point.prototype.neighborIsOpen = function(p) {
+    return (p != null) && !this.grid.hasDrawn(p) && !this.grid.hasSurrounded(p) && !this.wouldIntersect(p);
+  };
+
   Point.prototype.openNeighbors = function() {
     var _this = this;
-    return new Set(this.neighbors().filter(function(p) {
-      return !_this.grid.hasDrawn(p) && !_this.grid.hasSurrounded(p) && !_this.wouldIntersect(p);
-    }));
+    return this.neighbors().filter(function(p) {
+      return _this.neighborIsOpen(p);
+    });
   };
 
   Point.prototype.directionTo = function(dest) {
+    if (!(dest != null)) {
+      return null;
+    }
     if (this.x === dest.x && this.y > dest.y) {
       return 0;
     }
@@ -86,45 +93,48 @@ Point = (function() {
 
   Point.prototype.neighborAt = function(dir) {
     var _base, _base1, _base2, _base3, _base4, _base5, _base6, _base7;
+    if (!(dir != null)) {
+      return null;
+    }
     switch (dir) {
       case 0:
         if (this.y > 0) {
-          return (_base = this.neighbors)[0] || (_base[0] = new Point(this.x, this.y - 1, this.grid));
+          return (_base = this.neighbors)[0] || (_base[0] = this.grid.point(this.x, this.y - 1));
         }
         break;
       case 1:
         if (this.x < this.grid.width && this.y > 0) {
-          return (_base1 = this.neighbors)[1] || (_base1[1] = new Point(this.x + 1, this.y - 1, this.grid));
+          return (_base1 = this.neighbors)[1] || (_base1[1] = this.grid.point(this.x + 1, this.y - 1));
         }
         break;
       case 2:
         if (this.x < this.grid.width) {
-          return (_base2 = this.neighbors)[2] || (_base2[2] = new Point(this.x + 1, this.y, this.grid));
+          return (_base2 = this.neighbors)[2] || (_base2[2] = this.grid.point(this.x + 1, this.y));
         }
         break;
       case 3:
         if (this.x < this.grid.width && this.y < this.grid.height) {
-          return (_base3 = this.neighbors)[3] || (_base3[3] = new Point(this.x + 1, this.y + 1, this.grid));
+          return (_base3 = this.neighbors)[3] || (_base3[3] = this.grid.point(this.x + 1, this.y + 1));
         }
         break;
       case 4:
         if (this.y < this.grid.height) {
-          return (_base4 = this.neighbors)[4] || (_base4[4] = new Point(this.x, this.y + 1, this.grid));
+          return (_base4 = this.neighbors)[4] || (_base4[4] = this.grid.point(this.x, this.y + 1));
         }
         break;
       case 5:
         if (this.x > 0 && this.y < this.grid.height) {
-          return (_base5 = this.neighbors)[5] || (_base5[5] = new Point(this.x - 1, this.y + 1, this.grid));
+          return (_base5 = this.neighbors)[5] || (_base5[5] = this.grid.point(this.x - 1, this.y + 1));
         }
         break;
       case 6:
         if (this.x > 0) {
-          return (_base6 = this.neighbors)[6] || (_base6[6] = new Point(this.x - 1, this.y, this.grid));
+          return (_base6 = this.neighbors)[6] || (_base6[6] = this.grid.point(this.x - 1, this.y));
         }
         break;
       case 7:
         if (this.x > 0 && this.y > 0) {
-          return (_base7 = this.neighbors)[7] || (_base7[7] = new Point(this.x - 1, this.y - 1, this.grid));
+          return (_base7 = this.neighbors)[7] || (_base7[7] = this.grid.point(this.x - 1, this.y - 1));
         }
     }
     return null;
@@ -144,22 +154,6 @@ Point = (function() {
     intersector1 = this.neighborAt((dir + 1) % 8);
     intersector2 = this.neighborAt((dir - 1) % 8);
     return (intersector1 != null ? intersector1.connections.contains(intersector2) : void 0) || (intersector2 != null ? intersector2.connections.contains(intersector1) : void 0);
-  };
-
-  Point.prototype.findOpenNeighbor = function(getStartDirection) {
-    var dir, i, point, start, _i;
-    if (this.grid.hasSurrounded(this)) {
-      return null;
-    }
-    start = getStartDirection(this);
-    for (i = _i = 0; _i <= 7; i = ++_i) {
-      dir = (start + i) % 8;
-      point = this.neighborAt(dir);
-      if ((point != null) && !this.wouldIntersect(point, dir)) {
-        return point;
-      }
-    }
-    return null;
   };
 
   return Point;

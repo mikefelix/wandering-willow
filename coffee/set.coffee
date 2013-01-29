@@ -22,24 +22,24 @@ class Set
   filter: (f) ->
     r = new Set()
     for own item of @elements
-#      alert item + ': ' + f(@elements[item])
-      r.add(item) if f @elements[item]
+      e = @elements[item]
+      r.add(e) if f(e)
     r
   map: (f) ->
     r = new Set()
     for own item of @elements
       r.add f(@elements[item])
     r
-  findRandomElement: ->
+  randomElement: ->
     idx = Math.floor(Math.random() * Object.keys(@elements).length)
     i = 0
     for own item of @elements
-      return item if i is idx
+      return @elements[item] if i is idx
       i += 1
   toString: ->
     s = 'Set('
     for own i of @elements
       s += if s == 'Set(' then '' else ', '
-      s += i
+      s += @elements[i]
     s + ')'
 

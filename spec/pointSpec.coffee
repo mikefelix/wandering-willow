@@ -16,15 +16,15 @@ describe "Point", ->
       canvas: canvas
       cellSize: 10
       getDirection: DirectionFunctions.random()
-    @p33 = new Point(3, 3, g)
-    @p34 = new Point(3, 4, g)
-    @p35 = new Point(3, 5, g)
-    @p43 = new Point(4, 3, g)
-    @p44 = new Point(4, 4, g)
-    @p45 = new Point(4, 5, g)
-    @p53 = new Point(5, 3, g)
-    @p54 = new Point(5, 4, g)
-    @p55 = new Point(5, 5, g)
+    @p33 = g.point(3, 3)
+    @p34 = g.point(3, 4)
+    @p35 = g.point(3, 5)
+    @p43 = g.point(4, 3)
+    @p44 = g.point(4, 4)
+    @p45 = g.point(4, 5)
+    @p53 = g.point(5, 3)
+    @p54 = g.point(5, 4)
+    @p55 = g.point(5, 5)
 
   it 'toStrings', ->
     expect(@p33.toString()).toEqual '3/3'

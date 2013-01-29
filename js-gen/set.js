@@ -75,13 +75,14 @@ Set = (function() {
   };
 
   Set.prototype.filter = function(f) {
-    var item, r, _ref;
+    var e, item, r, _ref;
     r = new Set();
     _ref = this.elements;
     for (item in _ref) {
       if (!__hasProp.call(_ref, item)) continue;
-      if (f(this.elements[item])) {
-        r.add(item);
+      e = this.elements[item];
+      if (f(e)) {
+        r.add(e);
       }
     }
     return r;
@@ -98,7 +99,7 @@ Set = (function() {
     return r;
   };
 
-  Set.prototype.findRandomElement = function() {
+  Set.prototype.randomElement = function() {
     var i, idx, item, _ref;
     idx = Math.floor(Math.random() * Object.keys(this.elements).length);
     i = 0;
@@ -106,7 +107,7 @@ Set = (function() {
     for (item in _ref) {
       if (!__hasProp.call(_ref, item)) continue;
       if (i === idx) {
-        return item;
+        return this.elements[item];
       }
       i += 1;
     }
@@ -119,7 +120,7 @@ Set = (function() {
     for (i in _ref) {
       if (!__hasProp.call(_ref, i)) continue;
       s += s === 'Set(' ? '' : ', ';
-      s += i;
+      s += this.elements[i];
     }
     return s + ')';
   };
