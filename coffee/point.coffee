@@ -26,7 +26,7 @@ class Point
     return 5 if @x > dest.x and @y < dest.y
     return 6 if @x > dest.x and @y is dest.y
     return 7 if @x > dest.x and @y > dest.y
-    throw "Can't find direction to " + dest.toString()
+    throw "Can't find direction from " + @x + "/" + @y + " to " + dest.toString()
 
   neighborAt: (dir) =>
     return null if !dir?

@@ -88,7 +88,7 @@ Point = (function() {
     if (this.x > dest.x && this.y > dest.y) {
       return 7;
     }
-    throw "Can't find direction to " + dest.toString();
+    throw "Can't find direction from " + this.x + "/" + this.y + " to " + dest.toString();
   };
 
   Point.prototype.neighborAt = function(dir) {

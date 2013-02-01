@@ -16,7 +16,9 @@
                     canvas: c,
                     strokeStyle: 'white',
                     cellSize: 10,
-                    getDirection: DirectionFunctions.trendToCenter(.3),
+//                    getDirection: DirectionFunctions.trendToCenter(.3),
+//                    getDirection: DirectionFunctions.x(5, 0.5),
+                      getDirection: DirectionFunctions.squarish(),
                     //getBranchPoint: BranchFunctions.fromStart()
                     getBranchPoint: BranchFunctions.random()
                 });
