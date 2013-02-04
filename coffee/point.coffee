@@ -26,17 +26,18 @@ class Point
     return 5 if @x > dest.x and @y < dest.y
     return 6 if @x > dest.x and @y is dest.y
     return 7 if @x > dest.x and @y > dest.y
-    throw "Can't find direction from " + @x + "/" + @y + " to " + dest.toString()
+    0
+#    throw "Can't find direction from " + @x + "/" + @y + " to " + dest.toString()
 
   neighborAt: (dir) =>
     return null if !dir?
     switch dir
       when 0 then return @neighbors[0] or= @grid.point(@x, @y - 1) if @y > 0
-      when 1 then return @neighbors[1] or= @grid.point(@x + 1, @y - 1) if @x < @grid.width and @y > 0
-      when 2 then return @neighbors[2] or= @grid.point(@x + 1, @y) if @x < @grid.width
-      when 3 then return @neighbors[3] or= @grid.point(@x + 1, @y + 1) if @x < @grid.width and @y < @grid.height
-      when 4 then return @neighbors[4] or= @grid.point(@x, @y + 1) if @y < @grid.height
-      when 5 then return @neighbors[5] or= @grid.point(@x - 1, @y + 1) if @x > 0 and @y < @grid.height
+      when 1 then return @neighbors[1] or= @grid.point(@x + 1, @y - 1) if @x < @grid.width - 1 and @y > 0
+      when 2 then return @neighbors[2] or= @grid.point(@x + 1, @y) if @x < @grid.width - 1
+      when 3 then return @neighbors[3] or= @grid.point(@x + 1, @y + 1) if @x < @grid.width - 1 and @y < @grid.height - 1
+      when 4 then return @neighbors[4] or= @grid.point(@x, @y + 1) if @y < @grid.height - 1
+      when 5 then return @neighbors[5] or= @grid.point(@x - 1, @y + 1) if @x > 0 and @y < @grid.height - 1
       when 6 then return @neighbors[6] or= @grid.point(@x - 1, @y) if @x > 0
       when 7 then return @neighbors[7] or= @grid.point(@x - 1, @y - 1) if @x > 0 and @y > 0
     null

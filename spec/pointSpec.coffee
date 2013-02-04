@@ -15,7 +15,7 @@ describe "Point", ->
     g = new Grid
       canvas: canvas
       cellSize: 10
-      getDirection: DirectionFunctions.random()
+      getDirections: DirectionFunctions.random()
     @p33 = g.point(3, 3)
     @p34 = g.point(3, 4)
     @p35 = g.point(3, 5)

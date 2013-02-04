@@ -14,13 +14,10 @@
 
                 window.grid = new Grid({
                     canvas: c,
+                    getDirections: DirectionFunctions.weight(0.9, DirectionFunctions.explode()),
+                    getBranchPoint: BranchFunctions.random(),
                     strokeStyle: 'white',
-                    cellSize: 10,
-//                    getDirection: DirectionFunctions.trendToCenter(.3),
-//                    getDirection: DirectionFunctions.x(5, 0.5),
-                      getDirection: DirectionFunctions.squarish(),
-                    //getBranchPoint: BranchFunctions.fromStart()
-                    getBranchPoint: BranchFunctions.random()
+                    cellSize: 10
                 });
 
                 window.grid.draw();

@@ -1,20 +1,36 @@
 class Set
   constructor: (elems...) ->
     @elements = {}
+    @added = {}
     @order = []
-    @orderIdx = 0
     initial = if elems.length is 1 and typeof elems[0]?.length is 'number' then elems[0] else elems
-    for i in initial
-      @elements[i] = i
-      @order[@orderIdx++] = '' + i
-  contains: (e) -> @elements.hasOwnProperty(e)
-  add: (e) -> @elements[e] = e
-  remove: (e) -> delete @elements[e]
-  first: -> return @elements[e] for e of @elements
+    @add i for i in initial
+  contains: (e) -> @elements.hasOwnProperty e
+  add: (e) ->
+    @elements[e] = e
+    i = @order.length
+    @order[i] = e
+    @added[e] = i
+  remove: (e) ->
+    delete @elements[e]
+    @order.splice @added[e], 1
+    delete @added[e]
+  first: -> @order[0]
+  last: -> @order[@order.length - 1]
+  findFirst: (f) ->
+    for i in [0..@order.length - 1]
+      return @order[i] if f @order[i]
+    null
+  findLast: (f) ->
+    for i in [(@order.length - 1)..0]
+      return @order[i] if f @order[i]
+    null
   length: -> Object.keys(@elements).length
-  each: (f) ->
-    for own item of @elements
-      f(@elements[item])
+  each: (f) -> f(@elements[item]) for own item of @elements
+  toArray: ->
+    a = []
+    @each (e) -> a.push e
+    a
   any: (f) ->
     for own item of @elements
       return true if f @elements[item]
@@ -36,14 +52,11 @@ class Set
     r
   randomElement: ->
     idx = Math.floor(Math.random() * Object.keys(@elements).length)
-    i = 0
-    for own item of @elements
-      return @elements[item] if i is idx
-      i += 1
+    @order[idx]
   toString: ->
     s = 'Set('
-    for own i of @elements
+    for i in @order
       s += if s == 'Set(' then '' else ', '
-      s += @elements[i]
+      s += @order[i]
     s + ')'
 

@@ -9,13 +9,12 @@ Set = (function() {
     var elems, i, initial, _i, _len, _ref;
     elems = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
     this.elements = {};
+    this.added = {};
     this.order = [];
-    this.orderIdx = 0;
     initial = elems.length === 1 && typeof ((_ref = elems[0]) != null ? _ref.length : void 0) === 'number' ? elems[0] : elems;
     for (_i = 0, _len = initial.length; _i < _len; _i++) {
       i = initial[_i];
-      this.elements[i] = i;
-      this.order[this.orderIdx++] = '' + i;
+      this.add(i);
     }
   }
 
@@ -24,18 +23,45 @@ Set = (function() {
   };
 
   Set.prototype.add = function(e) {
-    return this.elements[e] = e;
+    var i;
+    this.elements[e] = e;
+    i = this.order.length;
+    this.order[i] = e;
+    return this.added[e] = i;
   };
 
   Set.prototype.remove = function(e) {
-    return delete this.elements[e];
+    delete this.elements[e];
+    this.order.splice(this.added[e], 1);
+    return delete this.added[e];
   };
 
   Set.prototype.first = function() {
-    var e;
-    for (e in this.elements) {
-      return this.elements[e];
+    return this.order[0];
+  };
+
+  Set.prototype.last = function() {
+    return this.order[this.order.length - 1];
+  };
+
+  Set.prototype.findFirst = function(f) {
+    var i, _i, _ref;
+    for (i = _i = 0, _ref = this.order.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+      if (f(this.order[i])) {
+        return this.order[i];
+      }
     }
+    return null;
+  };
+
+  Set.prototype.findLast = function(f) {
+    var i, _i, _ref;
+    for (i = _i = _ref = this.order.length - 1; _ref <= 0 ? _i <= 0 : _i >= 0; i = _ref <= 0 ? ++_i : --_i) {
+      if (f(this.order[i])) {
+        return this.order[i];
+      }
+    }
+    return null;
   };
 
   Set.prototype.length = function() {
@@ -51,6 +77,15 @@ Set = (function() {
       _results.push(f(this.elements[item]));
     }
     return _results;
+  };
+
+  Set.prototype.toArray = function() {
+    var a;
+    a = [];
+    this.each(function(e) {
+      return a.push(e);
+    });
+    return a;
   };
 
   Set.prototype.any = function(f) {
@@ -103,27 +138,19 @@ Set = (function() {
   };
 
   Set.prototype.randomElement = function() {
-    var i, idx, item, _ref;
+    var idx;
     idx = Math.floor(Math.random() * Object.keys(this.elements).length);
-    i = 0;
-    _ref = this.elements;
-    for (item in _ref) {
-      if (!__hasProp.call(_ref, item)) continue;
-      if (i === idx) {
-        return this.elements[item];
-      }
-      i += 1;
-    }
+    return this.order[idx];
   };
 
   Set.prototype.toString = function() {
-    var i, s, _ref;
+    var i, s, _i, _len, _ref;
     s = 'Set(';
-    _ref = this.elements;
-    for (i in _ref) {
-      if (!__hasProp.call(_ref, i)) continue;
+    _ref = this.order;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      i = _ref[_i];
       s += s === 'Set(' ? '' : ', ';
-      s += this.elements[i];
+      s += this.order[i];
     }
     return s + ')';
   };

@@ -9,8 +9,6 @@ Grid = (function() {
 
     this.draw = __bind(this.draw, this);
 
-    this.init = __bind(this.init, this);
-
     this.checkSurrounded = __bind(this.checkSurrounded, this);
 
     this.drawLine = __bind(this.drawLine, this);
@@ -21,8 +19,6 @@ Grid = (function() {
 
     this.markSurrounded = __bind(this.markSurrounded, this);
 
-    this.debug = __bind(this.debug, this);
-
     this.done = __bind(this.done, this);
 
     this.hasSurrounded = __bind(this.hasSurrounded, this);
@@ -30,20 +26,31 @@ Grid = (function() {
     this.hasDrawn = __bind(this.hasDrawn, this);
 
     this.point = __bind(this.point, this);
+
+    this.init = __bind(this.init, this);
     this.canvas = opts['canvas'];
     this.cellSize = opts['cellSize'];
-    this.getDirection = opts['getDirection'];
+    this.getDirections = opts['getDirections'];
     this.getBranchPoint = opts['getBranchPoint'];
     this.strokeStyle = opts['strokeStyle'];
+    this.currDirection = Math.floor(Math.random() * 8);
+    this.width = Math.floor(this.canvas.width / this.cellSize);
+    this.height = Math.floor(this.canvas.height / this.cellSize);
+    this.init();
+  }
+
+  Grid.prototype.init = function() {
+    this.c = this.canvas.getContext('2d');
+    this.c.lineWidth = 1;
+    this.c.strokeStyle = this.strokeStyle;
     this.drawn = new Set();
     this.surrounded = new Set();
     this.points = {};
     this.count = 0;
-    this.width = Math.floor(this.canvas.width / this.cellSize);
-    this.height = Math.floor(this.canvas.height / this.cellSize);
     this.center = this.point(Math.floor(this.width / 2), Math.floor(this.height / 2));
-    this.init();
-  }
+    this.origin = this.center;
+    return this.markDrawn(this.origin);
+  };
 
   Grid.prototype.point = function(x, y) {
     var _base, _name;
@@ -59,17 +66,7 @@ Grid = (function() {
   };
 
   Grid.prototype.done = function() {
-    return this.count >= (this.width + 1) * (this.height + 1);
-  };
-
-  Grid.prototype.debug = function(where, msg) {
-    var elem, v;
-    elem = $(where);
-    if (!(elem != null)) {
-      return;
-    }
-    v = where === 'news' ? elem.value : '';
-    return elem.value += v + msg;
+    return this.count >= this.width * this.height;
   };
 
   Grid.prototype.markSurrounded = function(point) {
@@ -85,7 +82,7 @@ Grid = (function() {
   };
 
   Grid.prototype.findOpenNeighbor = function(point) {
-    var i, neighbor, openNeighbors, start, _i;
+    var i, neighbor, openNeighbors, _i, _len, _ref;
     if (point instanceof Array) {
       point = this.point(point[0], point[1]);
     }
@@ -93,10 +90,12 @@ Grid = (function() {
       return null;
     }
     openNeighbors = point.openNeighbors();
-    start = this.getDirection(point, this);
-    for (i = _i = 0; _i <= 7; i = ++_i) {
-      neighbor = point.neighborAt((start + i) % 8);
-      if (point.neighborIsOpen(neighbor)) {
+    _ref = this.getDirections(point);
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      i = _ref[_i];
+      neighbor = point.neighborAt(i);
+      if ((neighbor != null) && point.neighborIsOpen(neighbor)) {
+        this.currDirection = i;
         return neighbor;
       }
     }
@@ -135,14 +134,6 @@ Grid = (function() {
     }
   };
 
-  Grid.prototype.init = function() {
-    this.c = this.canvas.getContext('2d');
-    this.c.lineWidth = 1;
-    this.c.strokeStyle = this.strokeStyle;
-    this.origin = this.center;
-    return this.markDrawn(this.origin);
-  };
-
   Grid.prototype.draw = function() {
     this.init();
     return this.drawOne();
@@ -160,13 +151,13 @@ Grid = (function() {
         alert("Can't find branch point.");
         return;
       }
-      dest = this.findOpenNeighbor(this.origin, this.getDirection);
+      dest = this.findOpenNeighbor(this.origin);
       if (!(dest != null)) {
         this.origin = null;
       }
     }
     while (!(dest != null)) {
-      dest = this.findOpenNeighbor(this.origin, this.getDirection);
+      dest = this.findOpenNeighbor(this.origin);
     }
     this.drawLine(this.origin, dest);
     this.origin = dest;

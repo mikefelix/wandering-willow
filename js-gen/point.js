@@ -88,7 +88,7 @@ Point = (function() {
     if (this.x > dest.x && this.y > dest.y) {
       return 7;
     }
-    throw "Can't find direction from " + this.x + "/" + this.y + " to " + dest.toString();
+    return 0;
   };
 
   Point.prototype.neighborAt = function(dir) {
@@ -103,27 +103,27 @@ Point = (function() {
         }
         break;
       case 1:
-        if (this.x < this.grid.width && this.y > 0) {
+        if (this.x < this.grid.width - 1 && this.y > 0) {
           return (_base1 = this.neighbors)[1] || (_base1[1] = this.grid.point(this.x + 1, this.y - 1));
         }
         break;
       case 2:
-        if (this.x < this.grid.width) {
+        if (this.x < this.grid.width - 1) {
           return (_base2 = this.neighbors)[2] || (_base2[2] = this.grid.point(this.x + 1, this.y));
         }
         break;
       case 3:
-        if (this.x < this.grid.width && this.y < this.grid.height) {
+        if (this.x < this.grid.width - 1 && this.y < this.grid.height - 1) {
           return (_base3 = this.neighbors)[3] || (_base3[3] = this.grid.point(this.x + 1, this.y + 1));
         }
         break;
       case 4:
-        if (this.y < this.grid.height) {
+        if (this.y < this.grid.height - 1) {
           return (_base4 = this.neighbors)[4] || (_base4[4] = this.grid.point(this.x, this.y + 1));
         }
         break;
       case 5:
-        if (this.x > 0 && this.y < this.grid.height) {
+        if (this.x > 0 && this.y < this.grid.height - 1) {
           return (_base5 = this.neighbors)[5] || (_base5[5] = this.grid.point(this.x - 1, this.y + 1));
         }
         break;

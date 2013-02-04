@@ -22,7 +22,7 @@ describe("Point", function() {
     g = new Grid({
       canvas: canvas,
       cellSize: 10,
-      getDirection: DirectionFunctions.random()
+      getDirections: DirectionFunctions.random()
     });
     this.p33 = g.point(3, 3);
     this.p34 = g.point(3, 4);

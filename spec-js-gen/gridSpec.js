@@ -36,7 +36,7 @@ describe("Grid", function() {
     return this.g = new Grid({
       canvas: canvas,
       cellSize: 10,
-      getDirection: DirectionFunctions.random()
+      getDirections: DirectionFunctions.random()
     });
   });
   it('always finds the only open neighbor', function() {

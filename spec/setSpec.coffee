@@ -76,3 +76,9 @@ describe "Set", ->
     expect(s2.contains(600)).toEqual true
     expect(s2.contains(40)).toEqual true
     expect(s2.contains(41)).toEqual false
+
+  it 'converts to array', ->
+    @s.add 1
+    @s.add 2
+    @s.add 3
+    expect(@s.toArray()).toEqual [1,2,3]

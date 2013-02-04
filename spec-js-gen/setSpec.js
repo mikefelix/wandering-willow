@@ -85,7 +85,7 @@ describe("Set", function() {
     });
     return expect(p.contains(2)).toEqual(false);
   });
-  return it('should map correctly', function() {
+  it('should map correctly', function() {
     var s2;
     this.s.add(1);
     this.s.add(300);
@@ -98,5 +98,11 @@ describe("Set", function() {
     expect(s2.contains(600)).toEqual(true);
     expect(s2.contains(40)).toEqual(true);
     return expect(s2.contains(41)).toEqual(false);
+  });
+  return it('converts to array', function() {
+    this.s.add(1);
+    this.s.add(2);
+    this.s.add(3);
+    return expect(this.s.toArray()).toEqual([1, 2, 3]);
   });
 });
