@@ -24,6 +24,7 @@ describe("Grid", function() {
       moveTo: function(x, y) {},
       lineTo: function(x, y) {},
       closePath: function() {},
+      clearRect: function() {},
       stroke: function() {}
     };
     canvas = {
@@ -33,10 +34,13 @@ describe("Grid", function() {
         return context;
       }
     };
-    return this.g = new Grid({
+    this.g = new Grid({
       canvas: canvas,
-      cellSize: 10,
-      getDirections: DirectionFunctions.random()
+      cellSize: 10
+    });
+    return this.g.init({
+      directionStyle: 'random',
+      branchStyle: 'random'
     });
   });
   it('always finds the only open neighbor', function() {

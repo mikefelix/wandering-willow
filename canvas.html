@@ -1,5 +1,9 @@
 <html> 
     <head>
+        <!--<script type="text/javascript" src="jquery.js"></script>-->
+        <link rel="stylesheet" href="css/jquery-ui-1.10.0.custom.css" />
+        <script src="jquery/jquery-1.9.0.js"></script>
+        <script src="jquery/jquery-ui-1.10.0.custom.js"></script>
         <script type="text/javascript" src="js-gen/set.js"></script>
         <script type="text/javascript" src="js-gen/point.js"></script>
         <script type="text/javascript" src="js-gen/directions.js"></script>
@@ -14,17 +18,141 @@
 
                 window.grid = new Grid({
                     canvas: c,
-                    getDirections: DirectionFunctions.weight(0.9, DirectionFunctions.explode()),
-                    getBranchPoint: BranchFunctions.random(),
                     strokeStyle: 'white',
-                    cellSize: 10
+                    cellSize: 10,
+                    onDone: function() {  }
                 });
-
-                window.grid.draw();
             }
+
+            function go(){
+                window.grid.draw({
+                    directionStyle: $('#directionStyle').val(),
+                    directionArg: $('#arg').val(),
+                    branchStyle: $('#branchStyle').val(),
+                    weight: Math.abs(parseFloat($('#weight').val()) - 1),
+                    branchTtl: $('#branchTtl').val(),
+                    speed: 0,
+                    fillPercent: $('#fillPercent').val() / 100
+                });
+            }
+
+            var argNames = {
+                favorDirection: 'Direction',
+                inertia: 'Mutation rate',
+                x: 'Width',
+                bounce: 'Start direction'
+            }
+            function onSelectDir(){
+                var name = argNames[$('#directionStyle').val()];
+                if (name){
+                    $('#argSection').show();
+                    $('#argName').html(name + ":");
+                }
+                else {
+                    $('#argSection').hide();
+                }
+            }
+
+            $(function(){
+                $('#directionStyle').change(onSelectDir);
+                $('#branchTtlSlide').slider({
+                    min: 1,
+                    max: 5,
+                    value: 2,
+                    step: 0.1,
+                    slide: function(event, ui) {
+                        $("#branchTtl").val(Math.floor(Math.pow(10, ui.value)));
+                    }
+                });
+                $('#weightSlide').slider({
+                    min: 0,
+                    max: 1,
+                    value: 0.1,
+                    step: 0.01,
+                    slide: function(event, ui) {
+                        $("#weight").val(ui.value);
+                    }
+                });
+                $('#fillPercentSlide').slider({
+                    min: 0,
+                    max: 1,
+                    value: 1,
+                    step: 0.01,
+                    slide: function(event, ui) {
+                        $("#fillPercent").val(parseInt(ui.value * 100));
+                    }
+                });
+                onSelectDir();
+                startGrid();
+            });
         </script>
+        <style>
+            .control { margin: 5px; }
+            .control input, .control select { background:black;color:white;margin-right:10px; }
+            .slider { display: inline-block; margin-top:5px; margin-left:20px; margin-right:20px; width: 150px; }
+            .container { display:inline-block; margin-right:25px; }
+        </style>
     </head>
-    <body style="background:black;overflow:hidden" onload="startGrid();">
-        <canvas style="width:1000px;height:700px" width="1000" height="700" id="canvas"></canvas>
+    <body style="background:black;color:white;overflow:hidden">
+    <div id="controls">
+        <div class="container">
+            <div class="control">
+                Style:
+                <select id="directionStyle" class="control">
+                    <option value="random">Random</option>
+                    <option value="favorDirection">Favor direction</option>
+                    <option value="trendToCenter">Trend to center</option>
+                    <option value="x">X</option>
+                    <option value="explode">Explode</option>
+                    <option value="jagged">Jagged</option>
+                    <option value="squarish">Squarish</option>
+                    <option value="inertia">Inertia</option>
+                    <option value="bounce">Bounce</option>
+                </select>
+                <span id="argSection" class="control">
+                    <span id="argName">Argument:</span>
+                    <input type="text" id="arg" value="" size="4"/>
+                </span>
+            </div>
+            <div class="control">
+                Branching:
+                <select id="branchStyle">
+                    <option value="random">Random</option>
+                    <option value="fromStart">From start</option>
+                    <option value="fromEnd">From end</option>
+                </select>
+            </div>
+        </div>
+        <div class="container">
+            <div class="control">
+                Randomization:
+                <div class="slider">
+                    <div id="weightSlide"></div>
+                </div>
+                <input type="text" id="weight" value="0.1" size="4"/>
+            </div>
+            <div class="control">
+                Max branch length:
+                <div class="slider">
+                    <div id="branchTtlSlide"></div>
+                </div>
+                <input type="text" id="branchTtl" value="100" size="4"/>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="control">
+                Fill percent:
+                <div class="slider">
+                    <div id="fillPercentSlide"></div>
+                </div>
+                <input type="text" id="fillPercent" value="100" size="4"/>
+            </div>
+            <input type="button" onclick="go();" value="Go!" />
+        </div>
+
+    </div>
+
+    <canvas style="width:1000px;height:700px" width="1000" height="700" id="canvas"></canvas>
     </body>
 </html>

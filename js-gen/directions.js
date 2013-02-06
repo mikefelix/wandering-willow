@@ -2,9 +2,13 @@
 var BranchFunctions, DirectionFunctions,
   __slice = [].slice;
 
-DirectionFunctions = {
-  all: [0, 1, 2, 3, 4, 5, 6, 7],
-  weight: function(w, func) {
+DirectionFunctions = (function() {
+
+  function DirectionFunctions() {}
+
+  DirectionFunctions.prototype.all = [0, 1, 2, 3, 4, 5, 6, 7];
+
+  DirectionFunctions.prototype.weight = function(w, func) {
     var _this = this;
     return function(point) {
       if (_this.weightCheck(w)) {
@@ -13,26 +17,30 @@ DirectionFunctions = {
         return _this.randomize(_this.all);
       }
     };
-  },
-  random: function() {
+  };
+
+  DirectionFunctions.prototype.random = function() {
     var _this = this;
     return function(point) {
       return _this.randomize(_this.all);
     };
-  },
-  favorDirection: function(dir) {
+  };
+
+  DirectionFunctions.prototype.favorDirection = function(dir) {
     var _this = this;
     return function(point) {
-      return _this.randomize(dir, [(dir + 1) % 8, (dir - 1) % 8]);
+      return _this.randomize(dir, [(dir + 1) % 8, (dir + 7) % 8]);
     };
-  },
-  trendToCenter: function() {
+  };
+
+  DirectionFunctions.prototype.trendToCenter = function() {
     var _this = this;
     return function(point) {
       return _this.favorDirection(point.directionTo(point.grid.center))(point);
     };
-  },
-  x: function(width) {
+  };
+
+  DirectionFunctions.prototype.x = function(width) {
     var _this = this;
     return function(point) {
       if (Math.abs(point.x - point.y) <= width || point.grid.width - (point.x + point.y) <= width) {
@@ -41,37 +49,42 @@ DirectionFunctions = {
         return _this.randomize(_this.all);
       }
     };
-  },
-  explode: function() {
+  };
+
+  DirectionFunctions.prototype.explode = function() {
     var _this = this;
     return function(point) {
       return _this.favorDirection((point.directionTo(point.grid.center) + 4) % 8)(point);
     };
-  },
-  jagged: function() {
+  };
+
+  DirectionFunctions.prototype.jagged = function() {
     var _this = this;
     return function(point) {
       return _this.randomize([1, 3, 5, 7]);
     };
-  },
-  squarish: function() {
+  };
+
+  DirectionFunctions.prototype.squarish = function() {
     var _this = this;
     return function(point) {
       return _this.randomize([0, 2, 4, 6]);
     };
-  },
-  inertia: function(mutationRate) {
+  };
+
+  DirectionFunctions.prototype.inertia = function(mutationRate) {
     var _this = this;
     return function(point) {
       var dir;
-      dir = point.grid.currentDirection;
+      dir = point.grid.currDirection;
       if (_this.weightCheck(mutationRate)) {
-        point.grid.currentDirection = Math.random() < 0.5 ? dir - 1 : dir + 1;
+        point.grid.currDirection = Math.random() < 0.5 ? dir - 1 : dir + 1;
       }
-      return _this.favorDirection(point.grid.currentDirection)(point);
+      return _this.favorDirection(point.grid.currDirection)(point);
     };
-  },
-  bounce: function(startDir) {
+  };
+
+  DirectionFunctions.prototype.bounce = function(startDir) {
     var _this = this;
     return function(point) {
       var grid;
@@ -120,11 +133,13 @@ DirectionFunctions = {
       }
       return _this.favorDirection(grid.currDirection)(point);
     };
-  },
-  weightCheck: function(weight) {
+  };
+
+  DirectionFunctions.prototype.weightCheck = function(weight) {
     return Math.random() < weight;
-  },
-  randomize: function() {
+  };
+
+  DirectionFunctions.prototype.randomize = function() {
     var a, all, e, elem, g, groups, res, shuffle, _i, _j, _k, _len, _len1, _len2;
     groups = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
     shuffle = function(list) {
@@ -161,30 +176,41 @@ DirectionFunctions = {
       res.push(e);
     }
     return res;
-  }
-};
+  };
 
-BranchFunctions = {
-  random: function() {
+  return DirectionFunctions;
+
+})();
+
+BranchFunctions = (function() {
+
+  function BranchFunctions() {}
+
+  BranchFunctions.prototype.random = function() {
     var _this = this;
     return function(grid) {
       return grid.drawn.randomElement();
     };
-  },
-  fromStart: function() {
+  };
+
+  BranchFunctions.prototype.fromStart = function() {
     var _this = this;
     return function(grid) {
       return grid.drawn.findFirst(function(p) {
         return p.openNeighbors().length() > 0;
       });
     };
-  },
-  fromEnd: function() {
+  };
+
+  BranchFunctions.prototype.fromEnd = function() {
     var _this = this;
     return function(grid) {
       return grid.drawn.findLast(function(p) {
         return p.openNeighbors().length() > 0;
       });
     };
-  }
-};
+  };
+
+  return BranchFunctions;
+
+})();

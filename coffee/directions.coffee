@@ -1,12 +1,12 @@
-DirectionFunctions =
+class DirectionFunctions
   all: [0,1,2,3,4,5,6,7]
   weight: (w, func) ->
     (point) => if @weightCheck w then func point else @randomize @all
   random: ->
     (point) => @randomize @all
   favorDirection: (dir) ->
-    (point) => @randomize dir, [(dir + 1) % 8, (dir - 1) % 8]
-  trendToCenter: () ->
+    (point) => @randomize dir, [(dir + 1) % 8, (dir + 7) % 8]
+  trendToCenter: ->
     (point) => @favorDirection(point.directionTo point.grid.center)(point)
   x: (width) ->
     (point) =>
@@ -22,10 +22,10 @@ DirectionFunctions =
     (point) => @randomize [0,2,4,6]
   inertia: (mutationRate) ->
     (point) =>
-      dir = point.grid.currentDirection
+      dir = point.grid.currDirection
       if @weightCheck mutationRate
-        point.grid.currentDirection = if Math.random() < 0.5 then dir - 1 else dir + 1
-      @favorDirection(point.grid.currentDirection) point
+        point.grid.currDirection = if Math.random() < 0.5 then dir - 1 else dir + 1
+      @favorDirection(point.grid.currDirection) point
   bounce: (startDir) ->
     (point) =>
       grid = point.grid
@@ -73,7 +73,7 @@ DirectionFunctions =
     res.push e for e in a
     res
 
-BranchFunctions =
+class BranchFunctions
   random: ->
     (grid) => grid.drawn.randomElement()
   fromStart: ->

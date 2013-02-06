@@ -24,16 +24,34 @@ Set = (function() {
 
   Set.prototype.add = function(e) {
     var i;
+    if (this.contains(e)) {
+      return;
+    }
     this.elements[e] = e;
     i = this.order.length;
     this.order[i] = e;
-    return this.added[e] = i;
+    this.added[e] = i;
+    if (this.order.length !== Object.keys(this.elements).length) {
+      return alert(this.order.length + ' ~ ' + Object.keys(this.elements).length);
+    }
   };
 
   Set.prototype.remove = function(e) {
+    var a, i, index, _i, _ref, _results;
+    if (e === -1) {
+      a = 1;
+    }
     delete this.elements[e];
-    this.order.splice(this.added[e], 1);
-    return delete this.added[e];
+    index = this.added[e];
+    this.order.splice(index, 1);
+    delete this.added[e];
+    if (index < this.order.length) {
+      _results = [];
+      for (i = _i = index, _ref = this.order.length - 1; index <= _ref ? _i <= _ref : _i >= _ref; i = index <= _ref ? ++_i : --_i) {
+        _results.push(this.added[this.order[i]] = this.added[this.order[i]] - 1);
+      }
+      return _results;
+    }
   };
 
   Set.prototype.first = function() {

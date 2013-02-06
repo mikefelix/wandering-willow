@@ -18,29 +18,67 @@ describe "Set", ->
     expect(@s.contains(4)).toEqual false
     expect(@s.length()).toEqual 3
 
-  it 'should add elements', ->
-    @s.add 1
-    expect(@s.contains(1)).toEqual true
-    expect(@s.contains(2)).toEqual false
-    expect(@s.length()).toEqual 1
-
-  it 'should not duplicate elements', ->
+  it 'should add and not duplicate elements', ->
     @s.add 1
     @s.add 1
     expect(@s.contains(1)).toEqual true
     expect(@s.contains(2)).toEqual false
     expect(@s.length()).toEqual 1
+    expect(@s.order.length).toEqual 1
 
   it 'should remove elements', ->
     @s.add 1
     @s.add 2
+    @s.add 3
+    @s.add 4
     expect(@s.contains(1)).toEqual true
     expect(@s.contains(2)).toEqual true
-    expect(@s.length()).toEqual 2
+    expect(@s.contains(3)).toEqual true
+    expect(@s.contains(4)).toEqual true
+    expect(@s.length()).toEqual 4
+    expect(@s.order.length).toEqual 4
+    expect(Object.keys(@s.added).length).toEqual 4
+    expect(Object.keys(@s.elements).length).toEqual 4
+    expect(@s.order[0]).toEqual 1
+    expect(@s.order[1]).toEqual 2
+    expect(@s.order[2]).toEqual 3
+    expect(@s.order[3]).toEqual 4
+    expect(@s.elements[4]).toEqual 4
+    expect(@s.added[1]).toEqual 0
+    expect(@s.added[4]).toEqual 3
+    @s.remove 4
+    expect(@s.contains(1)).toEqual true
+    expect(@s.contains(3)).toEqual true
+    expect(@s.contains(2)).toEqual true
+    expect(@s.contains(4)).toEqual false
+    expect(@s.length()).toEqual 3
+    expect(@s.order.length).toEqual 3
+    expect(Object.keys(@s.added).length).toEqual 3
+    expect(Object.keys(@s.elements).length).toEqual 3
+    expect(@s.order[0]).toEqual 1
+    expect(@s.order[1]).toEqual 2
+    expect(@s.order[2]).toEqual 3
+    expect(@s.order[3]).toEqual undefined
+    expect(@s.elements[4]).toEqual undefined
+    expect(@s.added[4]).toEqual undefined
+    expect(@s.added[3]).toEqual 2
     @s.remove 2
     expect(@s.contains(1)).toEqual true
+    expect(@s.contains(3)).toEqual true
     expect(@s.contains(2)).toEqual false
-    expect(@s.length()).toEqual 1
+    expect(@s.contains(4)).toEqual false
+    expect(@s.length()).toEqual 2
+    expect(@s.order.length).toEqual 2
+    expect(Object.keys(@s.added).length).toEqual 2
+    expect(Object.keys(@s.elements).length).toEqual 2
+    expect(@s.order[0]).toEqual 1
+    expect(@s.order[1]).toEqual 3
+    expect(@s.order[2]).toEqual undefined
+    expect(@s.elements[2]).toEqual undefined
+    expect(@s.elements[3]).toEqual 3
+    expect(@s.elements[1]).toEqual 1
+    expect(@s.elements[4]).toEqual undefined
+    expect(@s.added[3]).toEqual 1
 
   it 'should return what was added', ->
     @s.add '1'

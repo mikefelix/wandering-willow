@@ -10,7 +10,8 @@ describe("Point", function() {
       moveTo: function(x, y) {},
       lineTo: function(x, y) {},
       closePath: function() {},
-      stroke: function() {}
+      stroke: function() {},
+      clearRect: function() {}
     };
     canvas = {
       width: 100,
@@ -21,8 +22,11 @@ describe("Point", function() {
     };
     g = new Grid({
       canvas: canvas,
-      cellSize: 10,
-      getDirections: DirectionFunctions.random()
+      cellSize: 10
+    });
+    g.init({
+      directionStyle: 'random',
+      branchStyle: 'random'
     });
     this.p33 = g.point(3, 3);
     this.p34 = g.point(3, 4);

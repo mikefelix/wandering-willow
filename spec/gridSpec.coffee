@@ -14,6 +14,7 @@ describe "Grid", ->
       moveTo: (x,y) ->
       lineTo: (x,y) ->
       closePath: ->
+      clearRect: ->
       stroke: ->
     canvas =
       width: 100
@@ -22,7 +23,9 @@ describe "Grid", ->
     @g = new Grid
       canvas: canvas
       cellSize: 10
-      getDirections: DirectionFunctions.random()
+    @g.init
+      directionStyle: 'random'
+      branchStyle: 'random'
 
   it 'always finds the only open neighbor', ->
     @g.drawn.add(@g.point(5,5))

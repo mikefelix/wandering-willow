@@ -8,6 +8,7 @@ describe "Point", ->
       lineTo: (x,y) ->
       closePath: ->
       stroke: ->
+      clearRect: ->
     canvas =
       width: 100
       height: 100
@@ -15,7 +16,9 @@ describe "Point", ->
     g = new Grid
       canvas: canvas
       cellSize: 10
-      getDirections: DirectionFunctions.random()
+    g.init
+      directionStyle: 'random'
+      branchStyle: 'random'
     @p33 = g.point(3, 3)
     @p34 = g.point(3, 4)
     @p35 = g.point(3, 5)

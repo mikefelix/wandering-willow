@@ -5,11 +5,11 @@ var Grid,
 Grid = (function() {
 
   function Grid(opts) {
-    this.drawOne = __bind(this.drawOne, this);
-
     this.draw = __bind(this.draw, this);
 
-    this.checkSurrounded = __bind(this.checkSurrounded, this);
+    this.drawOne = __bind(this.drawOne, this);
+
+    this.drawLoop = __bind(this.drawLoop, this);
 
     this.drawLine = __bind(this.drawLine, this);
 
@@ -18,6 +18,8 @@ Grid = (function() {
     this.markDrawn = __bind(this.markDrawn, this);
 
     this.markSurrounded = __bind(this.markSurrounded, this);
+
+    this.checkSurrounded = __bind(this.checkSurrounded, this);
 
     this.done = __bind(this.done, this);
 
@@ -28,25 +30,36 @@ Grid = (function() {
     this.point = __bind(this.point, this);
 
     this.init = __bind(this.init, this);
+    this.onDone = opts['onDone'];
     this.canvas = opts['canvas'];
+    this.c = this.canvas.getContext('2d');
+    this.c.lineWidth = 1;
+    this.c.strokeStyle = opts['strokeStyle'];
     this.cellSize = opts['cellSize'];
-    this.getDirections = opts['getDirections'];
-    this.getBranchPoint = opts['getBranchPoint'];
-    this.strokeStyle = opts['strokeStyle'];
+    this.directionFunctions = new DirectionFunctions();
+    this.branchFunctions = new BranchFunctions();
     this.currDirection = Math.floor(Math.random() * 8);
     this.width = Math.floor(this.canvas.width / this.cellSize);
     this.height = Math.floor(this.canvas.height / this.cellSize);
-    this.init();
   }
 
-  Grid.prototype.init = function() {
-    this.c = this.canvas.getContext('2d');
-    this.c.lineWidth = 1;
-    this.c.strokeStyle = this.strokeStyle;
+  Grid.prototype.init = function(opts) {
+    if ((typeof window !== "undefined" && window !== null) && (window.drawTimer != null)) {
+      clearTimeout(window.drawTimer);
+    }
+    this.c.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.getDirections = this.directionFunctions[opts['directionStyle']](opts['directionArg']);
+    if (opts['weight'] != null) {
+      this.getDirections = this.directionFunctions.weight(opts['weight'], this.getDirections);
+    }
+    this.getBranchPoint = this.branchFunctions[opts['branchStyle']]();
+    this.maxBranchAge = opts['branchTtl'];
+    this.fillPercent = opts['fillPercent'];
     this.drawn = new Set();
     this.surrounded = new Set();
     this.points = {};
     this.count = 0;
+    this.branchAge = 0;
     this.center = this.point(Math.floor(this.width / 2), Math.floor(this.height / 2));
     this.origin = this.center;
     return this.markDrawn(this.origin);
@@ -66,7 +79,13 @@ Grid = (function() {
   };
 
   Grid.prototype.done = function() {
-    return this.count >= this.width * this.height;
+    return this.count >= this.width * this.height * this.fillPercent;
+  };
+
+  Grid.prototype.checkSurrounded = function(point) {
+    if (this.hasDrawn(point) && !this.hasSurrounded(point) && point.openNeighbors().length() === 0) {
+      return this.markSurrounded(point);
+    }
   };
 
   Grid.prototype.markSurrounded = function(point) {
@@ -123,29 +142,35 @@ Grid = (function() {
     this.markDrawn(dest);
     origin.connections.add(dest);
     this.checkSurrounded(dest);
-    return dest.neighbors().each(function(n) {
+    dest.neighbors().each(function(n) {
       return _this.checkSurrounded(n);
     });
-  };
-
-  Grid.prototype.checkSurrounded = function(point) {
-    if (this.hasDrawn(point) && !this.hasSurrounded(point) && point.openNeighbors().length() === 0) {
-      return this.markSurrounded(point);
+    if (this.drawn.length() !== Object.keys(this.drawn.elements).length || this.drawn.length() !== this.drawn.order.length) {
+      return alert(this.drawn.length() + ' / ' + Object.keys(this.drawn.elements).length + ' / ' + this.drawn.order.length);
     }
   };
 
-  Grid.prototype.draw = function() {
-    this.init();
-    return this.drawOne();
+  Grid.prototype.drawLoop = function() {
+    this.drawOne();
+    return window.drawTimeout = setTimeout(this.drawLoop, 0);
   };
 
   Grid.prototype.drawOne = function() {
-    var dest, _ref;
+    var bCount, dest, _ref;
     if (this.done()) {
+      if (this.onDone != null) {
+        this.onDone();
+      }
       return;
     }
     dest = null;
-    while (!((_ref = this.origin) != null ? _ref.branchable() : void 0)) {
+    while (!((_ref = this.origin) != null ? _ref.branchable() : void 0) || ((this.maxBranchAge != null) && this.branchAge >= this.maxBranchAge)) {
+      this.branchAge = 0;
+      bCount = bCount != null ? bCount + 1 : 1;
+      if (bCount > 1000) {
+        alert('Infinite loop while finding branch.');
+        return;
+      }
       this.origin = this.getBranchPoint(this);
       if (!(this.origin != null)) {
         alert("Can't find branch point.");
@@ -161,7 +186,12 @@ Grid = (function() {
     }
     this.drawLine(this.origin, dest);
     this.origin = dest;
-    return setTimeout(this.drawOne, 0);
+    return this.branchAge++;
+  };
+
+  Grid.prototype.draw = function(opts) {
+    this.init(opts);
+    return this.drawLoop();
   };
 
   return Grid;
