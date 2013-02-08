@@ -4,7 +4,9 @@ var Grid,
 
 Grid = (function() {
 
-  function Grid(opts) {
+  function Grid(canvas, onDone) {
+    this.canvas = canvas;
+    this.onDone = onDone;
     this.draw = __bind(this.draw, this);
 
     this.drawOne = __bind(this.drawOne, this);
@@ -30,24 +32,23 @@ Grid = (function() {
     this.point = __bind(this.point, this);
 
     this.init = __bind(this.init, this);
-    this.onDone = opts['onDone'];
-    this.canvas = opts['canvas'];
-    this.c = this.canvas.getContext('2d');
-    this.c.lineWidth = 1;
-    this.c.strokeStyle = opts['strokeStyle'];
-    this.cellSize = opts['cellSize'];
+
     this.directionFunctions = new DirectionFunctions();
     this.branchFunctions = new BranchFunctions();
-    this.currDirection = Math.floor(Math.random() * 8);
-    this.width = Math.floor(this.canvas.width / this.cellSize);
-    this.height = Math.floor(this.canvas.height / this.cellSize);
   }
 
   Grid.prototype.init = function(opts) {
     if ((typeof window !== "undefined" && window !== null) && (window.drawTimer != null)) {
       clearTimeout(window.drawTimer);
     }
+    this.c = this.canvas.getContext('2d');
+    this.c.lineWidth = 1;
     this.c.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.strokeStyle = opts['strokeStyle'];
+    this.cellSize = opts['cellSize'] || 10;
+    this.currDirection = Math.floor(Math.random() * 8);
+    this.width = Math.floor(this.canvas.width / this.cellSize);
+    this.height = Math.floor(this.canvas.height / this.cellSize);
     this.getDirections = this.directionFunctions[opts['directionStyle']](opts['directionArg']);
     if (opts['weight'] != null) {
       this.getDirections = this.directionFunctions.weight(opts['weight'], this.getDirections);
@@ -63,6 +64,24 @@ Grid = (function() {
     this.center = this.point(Math.floor(this.width / 2), Math.floor(this.height / 2));
     this.origin = this.center;
     return this.markDrawn(this.origin);
+  };
+
+  Grid.prototype.getStrokeStyle = function() {
+    var hex, num, step;
+    if (typeof this.strokeStyle === 'function') {
+      return this.strokeStyle();
+    }
+    if (this.strokeStyle === 'fade') {
+      step = 256 / this.maxBranchAge;
+      num = 255 - parseInt(this.branchAge * step);
+      hex = num.toString(16);
+      if (hex.length === 1) {
+        hex = '0' + hex;
+      }
+      return '#' + hex + hex + hex;
+    } else {
+      return this.strokeStyle;
+    }
   };
 
   Grid.prototype.point = function(x, y) {
@@ -132,6 +151,7 @@ Grid = (function() {
     if (dest instanceof Array) {
       dest = this.point(dest[0], dest[1]);
     }
+    this.c.strokeStyle = this.getStrokeStyle();
     this.c.beginPath();
     this.c.moveTo(origin.realX, origin.realY);
     this.c.lineTo(dest.realX, dest.realY);
@@ -151,8 +171,9 @@ Grid = (function() {
   };
 
   Grid.prototype.drawLoop = function() {
-    this.drawOne();
-    return window.drawTimeout = setTimeout(this.drawLoop, 0);
+    if (this.drawOne()) {
+      return window.drawTimeout = setTimeout(this.drawLoop, 0);
+    }
   };
 
   Grid.prototype.drawOne = function() {
@@ -161,7 +182,7 @@ Grid = (function() {
       if (this.onDone != null) {
         this.onDone();
       }
-      return;
+      return false;
     }
     dest = null;
     while (!((_ref = this.origin) != null ? _ref.branchable() : void 0) || ((this.maxBranchAge != null) && this.branchAge >= this.maxBranchAge)) {
@@ -169,12 +190,12 @@ Grid = (function() {
       bCount = bCount != null ? bCount + 1 : 1;
       if (bCount > 1000) {
         alert('Infinite loop while finding branch.');
-        return;
+        return false;
       }
       this.origin = this.getBranchPoint(this);
       if (!(this.origin != null)) {
         alert("Can't find branch point.");
-        return;
+        return false;
       }
       dest = this.findOpenNeighbor(this.origin);
       if (!(dest != null)) {
@@ -186,7 +207,8 @@ Grid = (function() {
     }
     this.drawLine(this.origin, dest);
     this.origin = dest;
-    return this.branchAge++;
+    this.branchAge++;
+    return true;
   };
 
   Grid.prototype.draw = function(opts) {

@@ -10,22 +10,21 @@
         <script type="text/javascript" src="js-gen/grid.js"></script>
         <script type="text/javascript">
             function startGrid(){
-                var c = document.getElementById('canvas');
-                c.width = window.innerWidth - 16;
-                c.height = window.innerHeight - 16;
+                var c = $('#canvas')[0];
+                var area = $('#drawArea')[0];
+
+                c.width = area.clientWidth - 16;
+                c.height = area.clientHeight - 56;
                 c.style.width = c.width + 'px';
                 c.style.height = c.height + 'px';
 
-                window.grid = new Grid({
-                    canvas: c,
-                    strokeStyle: 'white',
-                    cellSize: 10,
-                    onDone: function() {  }
-                });
+                window.grid = new Grid(c);
             }
 
             function go(){
                 window.grid.draw({
+                    strokeStyle: $('#fade')[0].checked ? 'fade' : 'white',
+                    cellSize: 10,
                     directionStyle: $('#directionStyle').val(),
                     directionArg: $('#arg').val(),
                     branchStyle: $('#branchStyle').val(),
@@ -42,6 +41,7 @@
                 x: 'Width',
                 bounce: 'Start direction'
             }
+
             function onSelectDir(){
                 var name = argNames[$('#directionStyle').val()];
                 if (name){
@@ -66,7 +66,7 @@
                 });
                 $('#weightSlide').slider({
                     min: 0,
-                    max: 1,
+                    max: 0.5,
                     value: 0.1,
                     step: 0.01,
                     slide: function(event, ui) {
@@ -82,6 +82,7 @@
                         $("#fillPercent").val(parseInt(ui.value * 100));
                     }
                 });
+                $('#go').click(go);
                 onSelectDir();
                 startGrid();
             });
@@ -148,11 +149,20 @@
                 </div>
                 <input type="text" id="fillPercent" value="100" size="4"/>
             </div>
-            <input type="button" onclick="go();" value="Go!" />
+            <div class="control">
+                <input type="checkbox" id="fade" /> Fade out
+            </div>
+        </div>
+
+        <div class="container">
+            <input type="button" id="go" value="Go!" />
         </div>
 
     </div>
 
-    <canvas style="width:1000px;height:700px" width="1000" height="700" id="canvas"></canvas>
+    <div id="drawArea" style="width:100%;height:100%">
+        <canvas id="canvas"></canvas>
+    </div>
+
     </body>
 </html>
