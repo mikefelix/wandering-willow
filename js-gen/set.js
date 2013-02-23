@@ -37,10 +37,7 @@ Set = (function() {
   };
 
   Set.prototype.remove = function(e) {
-    var a, i, index, _i, _ref, _results;
-    if (e === -1) {
-      a = 1;
-    }
+    var i, index, _i, _ref, _results;
     delete this.elements[e];
     index = this.added[e];
     this.order.splice(index, 1);

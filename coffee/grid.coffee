@@ -16,16 +16,20 @@ class Grid
     @getDirections = @directionFunctions[opts['directionStyle']](opts['directionArg'])
     @getDirections = @directionFunctions.weight(opts['weight'], @getDirections) if opts['weight']?
     @getBranchPoint = @branchFunctions[opts['branchStyle']]()
-    @maxBranchAge = opts['branchTtl']
-    @fillPercent = opts['fillPercent']
+    @maxBranchAge = parseInt opts['branchTtl']
+    @fillPercent = parseFloat opts['fillPercent'] if opts['fillPercent']?
+    @maxBranchCount = parseInt opts['maxBranchCount'] if opts['maxBranchCount']?
+    @onDone = opts['onDone'] if opts['onDone']?
     @drawn = new Set()
     @surrounded = new Set()
     @points = {}
+    @branchCount = 0
     @count = 0
     @branchAge = 0
     @center = @point(Math.floor(@width / 2), Math.floor(@height / 2))
     @origin = @center
     @markDrawn @origin
+    @finish = false
 
   getStrokeStyle: ->
     return @strokeStyle() if typeof @strokeStyle is 'function'
@@ -44,7 +48,17 @@ class Grid
 
   hasSurrounded: (point) => point? and @surrounded.contains point
 
-  done: => @count >= @width * @height * @fillPercent
+  done: =>
+    d = if @finish
+      true
+    else if @maxBranchCount?
+      @branchCount >= @maxBranchCount
+    else if @fillPercent?
+      @count >= @width * @height * @fillPercent
+    else
+      @count >= @width * @height
+    @onDone() if d and @onDone?
+    d
 
   checkSurrounded: (point) =>
     @markSurrounded(point) if @hasDrawn(point) and not @hasSurrounded(point) and point.openNeighbors().length() is 0
@@ -94,12 +108,12 @@ class Grid
       window.drawTimeout = setTimeout @drawLoop, 0
 
   drawOne: =>
-    if @done()
-      @onDone() if @onDone?
-      return false
+    return true if @done()
     dest = null
     while not @origin?.branchable() or (@maxBranchAge? and @branchAge >= @maxBranchAge)
       @branchAge = 0
+      @branchCount++
+      return true if @done()
       bCount = if bCount? then bCount + 1 else 1
       if bCount > 1000
         alert 'Infinite loop while finding branch.' # + tried[0].toString() + ',' + tried[1].toString() + ',' + tried[2].toString()

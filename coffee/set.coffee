@@ -15,22 +15,12 @@ class Set
     if @order.length != Object.keys(@elements).length
       alert @order.length + ' ~ ' + Object.keys(@elements).length
   remove: (e) ->
-    if e is -1
-      a = 1
-#    k = ''
-#    k += i + ',' for own i of @elements
-#    s = 'Removing ' + e + ' from ' + k + ' with added of ' + @added[e] + ', order contains ' + @order.join(',')
     delete @elements[e]
     index = @added[e]
     @order.splice index, 1
     delete @added[e]
     if index < @order.length
-      for i in [index..@order.length - 1]
-        @added[@order[i]] = @added[@order[i]] - 1
-#    if @order.length != Object.keys(@elements).length
-#      k = ''
-#      k += i + ',' for own i of @elements
-#      alert s + "\nAfter: elements are " + k + ' order contains ' + @order.join(',')
+      @added[@order[i]] = @added[@order[i]] - 1 for i in [index..@order.length - 1]
   first: -> @order[0]
   last: -> @order[@order.length - 1]
   findFirst: (f) ->

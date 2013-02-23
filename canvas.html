@@ -1,4 +1,5 @@
-<html> 
+<!--suppress HtmlFormInputWithoutLabel -->
+<html>
     <head>
         <!--<script type="text/javascript" src="jquery.js"></script>-->
         <link rel="stylesheet" href="css/jquery-ui-1.10.0.custom.css" />
@@ -22,7 +23,7 @@
             }
 
             function go(){
-                window.grid.draw({
+                var opts = {
                     strokeStyle: $('#fade')[0].checked ? 'fade' : 'white',
                     cellSize: 10,
                     directionStyle: $('#directionStyle').val(),
@@ -31,8 +32,29 @@
                     weight: Math.abs(parseFloat($('#weight').val()) - 1),
                     branchTtl: $('#branchTtl').val(),
                     speed: 0,
-                    fillPercent: $('#fillPercent').val() / 100
-                });
+                    onDone: function() { $('#go').val('Done'); }
+                };
+
+                var finishStyle = $('#finishStyle').val();
+                if (finishStyle == 'percent')
+                    opts['fillPercent'] = $('#fillPercent').val() / 100;
+                else
+                    opts['maxBranchCount'] = $('#maxBranchCount').val();
+
+                window.grid.draw(opts);
+            }
+
+            function clickGo(){
+                var controls = $("#controls");
+                if (controls.is(":hidden")) {
+                    window.grid.finish = true;
+                    controls.slideDown("slow");
+                    $('#go').val('Go');
+                } else {
+                    controls.slideUp('slow');
+                    $('#go').val('Stop');
+                    go();
+                }
             }
 
             var argNames = {
@@ -40,7 +62,7 @@
                 inertia: 'Mutation rate',
                 x: 'Width',
                 bounce: 'Start direction'
-            }
+            };
 
             function onSelectDir(){
                 var name = argNames[$('#directionStyle').val()];
@@ -53,8 +75,39 @@
                 }
             }
 
+            function onSelectFinish(){
+                var sel = $('#finishStyle')[0];
+                if (sel.selectedIndex == 0) {
+                    $('#maxBranchCtrl').hide();
+                    $('#fillPercentCtrl').show();
+                }
+                else {
+                    $('#fillPercentCtrl').hide();
+                    $('#maxBranchCtrl').show();
+                }
+            }
+
             $(function(){
                 $('#directionStyle').change(onSelectDir);
+                $('#finishStyle').change(onSelectFinish);
+                $('#argSlide').slider({
+                    min: 5,
+                    max: 100,
+                    value: 100,
+                    step: 1,
+                    slide: function(event, ui) {
+                        $("#maxBranchCount").val(ui.value);
+                    }
+                });
+                $('#maxBranchSlide').slider({
+                    min: 5,
+                    max: 1000,
+                    value: 100,
+                    step: 1,
+                    slide: function(event, ui) {
+                        $("#maxBranchCount").val(ui.value);
+                    }
+                });
                 $('#branchTtlSlide').slider({
                     min: 1,
                     max: 5,
@@ -82,82 +135,96 @@
                         $("#fillPercent").val(parseInt(ui.value * 100));
                     }
                 });
-                $('#go').click(go);
+                $('#go').click(clickGo);
                 onSelectDir();
+                onSelectFinish();
                 startGrid();
             });
         </script>
         <style>
-            .control { margin: 5px; }
-            .control input, .control select { background:black;color:white;margin-right:10px; }
+            body { background:black;color:white;overflow:hidden;font-family:arial,sans-serif;font-size:0.8em }
+            .control input, .control select { background:black;color:white }
+            /*.control select { width: 100%; }*/
             .slider { display: inline-block; margin-top:5px; margin-left:20px; margin-right:20px; width: 150px; }
-            .container { display:inline-block; margin-right:25px; }
+            .container { display:inline-block; vertical-align:top; }
         </style>
     </head>
-    <body style="background:black;color:white;overflow:hidden">
-    <div id="controls">
+    <body>
+    <div id="controls" style="position:absolute;top:0;margin-left:20px">
         <div class="container">
             <div class="control">
-                Style:
                 <select id="directionStyle" class="control">
-                    <option value="random">Random</option>
+                    <option value="random">Wander at random</option>
                     <option value="favorDirection">Favor direction</option>
                     <option value="trendToCenter">Trend to center</option>
-                    <option value="x">X</option>
+                    <option value="x">Form an X</option>
                     <option value="explode">Explode</option>
-                    <option value="jagged">Jagged</option>
-                    <option value="squarish">Squarish</option>
-                    <option value="inertia">Inertia</option>
+                    <option value="jagged">Go jaggedly</option>
+                    <option value="squarish">Go squarishly</option>
+                    <option value="inertia">Use inertia</option>
                     <option value="bounce">Bounce</option>
                 </select>
-                <span id="argSection" class="control">
-                    <span id="argName">Argument:</span>
-                    <input type="text" id="arg" value="" size="4"/>
-                </span>
-            </div>
-            <div class="control">
-                Branching:
                 <select id="branchStyle">
-                    <option value="random">Random</option>
-                    <option value="fromStart">From start</option>
-                    <option value="fromEnd">From end</option>
+                    <option value="random">Branch at random</option>
+                    <option value="fromStart">Branch from start</option>
+                    <option value="fromEnd">Branch from end</option>
                 </select>
             </div>
         </div>
         <div class="container">
             <div class="control">
-                Randomization:
+                <select id="finishStyle">
+                    <option value="percent">Fill percent:</option>
+                    <option value="branch">Draw branches:</option>
+                </select>
+                <div class="control" id="fillPercentCtrl">
+                    <div class="slider">
+                        <div id="fillPercentSlide"></div>
+                    </div>
+                    <input type="text" id="fillPercent" value="100" size="4"/>
+                </div>
+                <div class="control" id="maxBranchCtrl">
+                    <div class="slider">
+                        <div id="maxBranchSlide"></div>
+                    </div>
+                    <input type="text" id="maxBranchCount" value="100" size="4"/>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="control">
+                Randomization:<br/>
                 <div class="slider">
                     <div id="weightSlide"></div>
                 </div>
                 <input type="text" id="weight" value="0.1" size="4"/>
             </div>
             <div class="control">
-                Max branch length:
+                Max branch length:<br/>
                 <div class="slider">
                     <div id="branchTtlSlide"></div>
                 </div>
                 <input type="text" id="branchTtl" value="100" size="4"/>
             </div>
+            <div id="argSection" class="control">
+                <span id="argName">Argument:</span>
+                <div class="slider">
+                    <div id="argSlide"></div>
+                </div>
+                <input type="text" id="arg" value="" size="4"/>
+            </div>
         </div>
 
         <div class="container">
-            <div class="control">
-                Fill percent:
-                <div class="slider">
-                    <div id="fillPercentSlide"></div>
-                </div>
-                <input type="text" id="fillPercent" value="100" size="4"/>
-            </div>
             <div class="control">
                 <input type="checkbox" id="fade" /> Fade out
             </div>
         </div>
 
-        <div class="container">
-            <input type="button" id="go" value="Go!" />
-        </div>
+    </div>
 
+    <div class="container" style="position:absolute;top:0;right:0">
+        <input type="button" id="go" value="Go!" />
     </div>
 
     <div id="drawArea" style="width:100%;height:100%">

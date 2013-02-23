@@ -54,16 +54,26 @@ Grid = (function() {
       this.getDirections = this.directionFunctions.weight(opts['weight'], this.getDirections);
     }
     this.getBranchPoint = this.branchFunctions[opts['branchStyle']]();
-    this.maxBranchAge = opts['branchTtl'];
-    this.fillPercent = opts['fillPercent'];
+    this.maxBranchAge = parseInt(opts['branchTtl']);
+    if (opts['fillPercent'] != null) {
+      this.fillPercent = parseFloat(opts['fillPercent']);
+    }
+    if (opts['maxBranchCount'] != null) {
+      this.maxBranchCount = parseInt(opts['maxBranchCount']);
+    }
+    if (opts['onDone'] != null) {
+      this.onDone = opts['onDone'];
+    }
     this.drawn = new Set();
     this.surrounded = new Set();
     this.points = {};
+    this.branchCount = 0;
     this.count = 0;
     this.branchAge = 0;
     this.center = this.point(Math.floor(this.width / 2), Math.floor(this.height / 2));
     this.origin = this.center;
-    return this.markDrawn(this.origin);
+    this.markDrawn(this.origin);
+    return this.finish = false;
   };
 
   Grid.prototype.getStrokeStyle = function() {
@@ -98,7 +108,12 @@ Grid = (function() {
   };
 
   Grid.prototype.done = function() {
-    return this.count >= this.width * this.height * this.fillPercent;
+    var d;
+    d = this.finish ? true : this.maxBranchCount != null ? this.branchCount >= this.maxBranchCount : this.fillPercent != null ? this.count >= this.width * this.height * this.fillPercent : this.count >= this.width * this.height;
+    if (d && (this.onDone != null)) {
+      this.onDone();
+    }
+    return d;
   };
 
   Grid.prototype.checkSurrounded = function(point) {
@@ -179,14 +194,15 @@ Grid = (function() {
   Grid.prototype.drawOne = function() {
     var bCount, dest, _ref;
     if (this.done()) {
-      if (this.onDone != null) {
-        this.onDone();
-      }
-      return false;
+      return true;
     }
     dest = null;
     while (!((_ref = this.origin) != null ? _ref.branchable() : void 0) || ((this.maxBranchAge != null) && this.branchAge >= this.maxBranchAge)) {
       this.branchAge = 0;
+      this.branchCount++;
+      if (this.done()) {
+        return true;
+      }
       bCount = bCount != null ? bCount + 1 : 1;
       if (bCount > 1000) {
         alert('Infinite loop while finding branch.');
