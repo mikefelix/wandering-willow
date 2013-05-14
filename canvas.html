@@ -3,6 +3,7 @@
     <head>
         <!--<script type="text/javascript" src="jquery.js"></script>-->
         <link rel="stylesheet" href="css/jquery-ui-1.10.0.custom.css" />
+        <link rel="stylesheet" href="willow.css" />
         <script src="jquery/jquery-1.9.0.js"></script>
         <script src="jquery/jquery-ui-1.10.0.custom.js"></script>
         <script type="text/javascript" src="js-gen/set.js"></script>
@@ -141,16 +142,9 @@
                 startGrid();
             });
         </script>
-        <style>
-            body { background:black;color:white;overflow:hidden;font-family:arial,sans-serif;font-size:0.8em }
-            .control input, .control select { background:black;color:white }
-            /*.control select { width: 100%; }*/
-            .slider { display: inline-block; margin-top:5px; margin-left:20px; margin-right:20px; width: 150px; }
-            .container { display:inline-block; vertical-align:top; }
-        </style>
     </head>
     <body>
-    <div id="controls" style="position:absolute;top:0;margin-left:20px">
+    <div id="controls">
         <div class="container">
             <div class="control">
                 <select id="directionStyle" class="control">
@@ -163,7 +157,7 @@
                     <option value="squarish">Go squarishly</option>
                     <option value="inertia">Use inertia</option>
                     <option value="bounce">Bounce</option>
-                </select>
+                </select><br/>
                 <select id="branchStyle">
                     <option value="random">Branch at random</option>
                     <option value="fromStart">Branch from start</option>
@@ -223,11 +217,11 @@
 
     </div>
 
-    <div class="container" style="position:absolute;top:0;right:0">
+    <div id="buttonContainer" class="container">
         <input type="button" id="go" value="Go!" />
     </div>
 
-    <div id="drawArea" style="width:100%;height:100%">
+    <div id="drawArea">
         <canvas id="canvas"></canvas>
     </div>
 
