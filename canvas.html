@@ -1,198 +1,20 @@
 <!--suppress HtmlFormInputWithoutLabel -->
-<html>
+<html ng-app="WillowApp">
     <head>
         <!--<script type="text/javascript" src="jquery.js"></script>-->
         <link rel="stylesheet" href="css/jquery-ui-1.10.0.custom.css" />
         <link rel="stylesheet" href="willow.css" />
         <script src="jquery/jquery-1.9.0.js"></script>
+        <script src="angular/angular.js"></script>
         <script src="jquery/jquery-ui-1.10.0.custom.js"></script>
         <script type="text/javascript" src="js-gen/set.js"></script>
         <script type="text/javascript" src="js-gen/point.js"></script>
         <script type="text/javascript" src="js-gen/directions.js"></script>
         <script type="text/javascript" src="js-gen/grid.js"></script>
-        <script type="text/javascript">
-            function startGrid(){
-                var c = $('#canvas')[0];
-                var area = $('#drawArea')[0];
-
-                c.width = area.clientWidth - 16;
-                c.height = area.clientHeight - 56;
-                c.style.width = c.width + 'px';
-                c.style.height = c.height + 'px';
-
-                window.grid = new Grid(c);
-            }
-
-            function go(){
-                var opts = {
-                    strokeStyle: $('#fade')[0].checked ? 'fade' : 'white',
-                    cellSize: 10,
-                    directionStyle: $('#directionStyle').val(),
-                    directionArg: directionalArgSlide ? $('#dirArg').val() : $('#arg').val(),
-                    branchStyle: $('#branchStyle').val(),
-                    weight: Math.abs(parseFloat($('#weight').val()) - 1),
-                    branchTtl: $('#branchTtl').val(),
-                    speed: 0,
-                    onDone: function() { $('#go').val('Go!'); }
-                };
-
-                var finishStyle = $('#finishStyle').val();
-                if (finishStyle == 'percent')
-                    opts['fillPercent'] = $('#fillPercent').val() / 100;
-                else
-                    opts['maxBranchCount'] = $('#maxBranchCount').val();
-
-                window.grid.draw(opts);
-            }
-
-            function clickGo(){
-                var controls = $("#controls");
-                if (controls.is(":hidden")) {
-                    window.grid.finish = true;
-                    controls.slideDown("slow");
-                    $('#go').val('Go');
-                } else {
-                    controls.slideUp('slow');
-                    $('#go').val('Stop');
-                    go();
-                }
-            }
-
-            var argNames = {
-                favorDirection: 'Direction',
-                inertia: 'Mutation rate',
-                x: 'Width',
-                bounce: 'Start direction'
-            };
-
-            var argInits = {
-                favorDirection: 0,
-                inertia: 0,
-                x: 30,
-                bounce: 0
-            };
-
-            var directionalArgSlide;
-            var directions = ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'];
-
-            function onSelectDir(){
-                var type = $('#directionStyle').val();
-                var name = argNames[type];
-                directionalArgSlide = (type == 'favorDirection' || type == 'bounce');
-
-                if (name){
-                    if (directionalArgSlide){
-                        $('#argSection').hide();
-                        $('#dirArg').val(argInits[type]);
-                        $('#dirArgSection').show();
-                        $('#dirArgName').html(name + ":");
-                    }
-                    else {
-                        $('#dirArgSection').hide();
-                        $('#arg').val(argInits[type]);
-                        $('#argSection').show();
-                        $('#argName').html(name + ":");
-                    }
-                }
-                else {
-                    $('#arg').val('');
-                    $('#argSection').hide();
-                    $('#dirArg').val('');
-                    $('#dirArgSection').hide();
-                }
-            }
-
-            function onSelectFinish(){
-                var sel = $('#finishStyle')[0];
-                if (sel.selectedIndex == 0) {
-                    $('#maxBranchCtrl').hide();
-                    $('#fillPercentCtrl').show();
-                }
-                else {
-                    $('#fillPercentCtrl').hide();
-                    $('#maxBranchCtrl').show();
-                }
-            }
-
-            function showVal(id, val, text){
-                $("#" + id).val(val);
-                var span = $("#" + id + "_text");
-                if (span)
-                    span.html(text ? text : val);
-            }
-
-            $(function(){
-                $('#directionStyle').change(onSelectDir);
-                $('#finishStyle').change(onSelectFinish);
-                $('#argSlide').slider({
-                    min: 5,
-                    max: 100,
-                    value: 10,
-                    step: 1,
-                    slide: function(event, ui) {
-                        showVal('arg', ui.value);
-                    }
-                });
-                $('#dirArgSlide').slider({
-                    min: 0,
-                    max: 7,
-                    value: 0,
-                    step: 1,
-                    slide: function(event, ui) {
-                        showVal('dirArg', ui.value, directions[ui.value]);
-//                        $("#dirArg").val(ui.value);
-//                        $("#dirArgText").val(directions[ui.value]);
-                    }
-                });
-                $('#maxBranchSlide').slider({
-                    min: 5,
-                    max: 1000,
-                    value: 100,
-                    step: 1,
-                    slide: function(event, ui) {
-                        showVal('maxBranchCount', ui.value);
-//                        $("#maxBranchCount").val(ui.value);
-                    }
-                });
-                $('#branchTtlSlide').slider({
-                    min: 1,
-                    max: 5,
-                    value: 2,
-                    step: 0.1,
-                    slide: function(event, ui) {
-                        var ttl = Math.floor(Math.pow(10, ui.value));
-                        showVal('branchTtl', ttl);
-//                        $("#branchTtl").val(floor);
-                    }
-                });
-                $('#weightSlide').slider({
-                    min: 0,
-                    max: 0.5,
-                    value: 0.1,
-                    step: 0.01,
-                    slide: function(event, ui) {
-                        showVal('weight', ui.value);
-//                        $("#weight").val(ui.value);
-                    }
-                });
-                $('#fillPercentSlide').slider({
-                    min: 0,
-                    max: 1,
-                    value: 1,
-                    step: 0.01,
-                    slide: function(event, ui) {
-                        showVal('fillPercent', ui.value * 100);
-//                        $("#fillPercent").val(parseInt(ui.value * 100));
-                    }
-                });
-                $('#go').click(clickGo);
-                onSelectDir();
-                onSelectFinish();
-                startGrid();
-            });
-        </script>
+        <script type="text/javascript" src="js-gen/app.js"></script>
+        <script type="text/javascript" src="js-gen/init.js"></script>
     </head>
-    <body>
+    <body ng-controller="WillowCtrl">
     <div id="controls">
         <div class="container">
             <h2>Style</h2>
@@ -234,13 +56,13 @@
                 </select>
             </div>
             <div class="control">
-                Max length: <span id="branchTtl_text"></span><br/>
-                <div class="slider">
-                    <div id="branchTtlSlide"></div>
-                </div>
-                <input type="text" id="branchTtl" value="100" size="4"/>
+                Fade out:
+                <input type="checkbox" id="fade" style="display:inline"/>
             </div>
-            <div class="control"><input type="checkbox" id="fade" /> Fade out</div>
+            <slider id="branchTtl" text="Max length" model="branchTtl"
+                    min="1" max="5" step="1" display-value="unchanged"
+                    convert-value="logarithmic" />
+
         </div>
         <div class="container">
             <h2>Completion</h2>
