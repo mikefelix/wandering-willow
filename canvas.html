@@ -1,111 +1,45 @@
 <!--suppress HtmlFormInputWithoutLabel -->
 <html ng-app="WillowApp">
-    <head>
-        <!--<script type="text/javascript" src="jquery.js"></script>-->
-        <link rel="stylesheet" href="css/jquery-ui-1.10.0.custom.css" />
-        <link rel="stylesheet" href="willow.css" />
-        <script src="jquery/jquery-1.9.0.js"></script>
-        <script src="angular/angular.js"></script>
-        <script src="jquery/jquery-ui-1.10.0.custom.js"></script>
-        <script type="text/javascript" src="js-gen/set.js"></script>
-        <script type="text/javascript" src="js-gen/point.js"></script>
-        <script type="text/javascript" src="js-gen/directions.js"></script>
-        <script type="text/javascript" src="js-gen/grid.js"></script>
-        <script type="text/javascript" src="js-gen/app.js"></script>
-        <script type="text/javascript" src="js-gen/init.js"></script>
-    </head>
-    <body ng-controller="WillowCtrl">
-    <div id="controls">
-        <div class="container">
-            <h2>Style</h2>
-            <div class="control">
-                <select id="directionStyle" class="control">
-                    <option value="random">Wander at random</option>
-                    <option value="favorDirection">Favor direction</option>
-                    <option value="trendToCenter">Trend to center</option>
-                    <option value="x">Form an X</option>
-                    <option value="explode">Explode</option>
-                    <option value="jagged">Go jaggedly</option>
-                    <option value="squarish">Go squarishly</option>
-                    <option value="inertia">Use inertia</option>
-                    <option value="bounce">Bounce</option>
-                </select><br/>
-            </div>
-            <div id="argSection" class="control">
-                <span id="argName">Argument:</span><span id="arg_text"></span><br/>
-                <div class="slider">
-                    <div id="argSlide"></div>
-                </div>
-                <input type="text" id="arg" value="10" size="4"/>
-            </div>
-            <div id="dirArgSection" class="control">
-                <span id="dirArgName">Direction:</span><span id="dirArg_text"></span><br/>
-                <div class="slider">
-                    <div id="dirArgSlide"></div>
-                </div>
-                <input type="text" id="dirArg" value="0" size="4" />
-            </div>
-        </div>
-        <div class="container">
-            <h2>Branching</h2>
-            <div class="control">
-                <select id="branchStyle">
-                    <option value="random">Random</option>
-                    <option value="fromStart">From start</option>
-                    <option value="fromEnd">From end</option>
-                </select>
-            </div>
-            <div class="control">
-                Fade out:
-                <input type="checkbox" id="fade" style="display:inline"/>
-            </div>
-            <slider id="branchTtl" text="Max length" model="branchTtl"
-                    min="1" max="5" step="1" display-value="unchanged"
-                    convert-value="logarithmic" />
-
-        </div>
-        <div class="container">
-            <h2>Completion</h2>
-            <div class="control">
-                <select id="finishStyle"> <span id="fillPercent_text"></span><span id="maxBranchCount_text"></span>
-                    <option value="percent">Fill percent:</option>
-                    <option value="branch">Draw branches:</option>
-                </select>
-            </div>
-            <div class="control" id="fillPercentCtrl">
-                <div class="slider">
-                    <div id="fillPercentSlide"></div>
-                </div>
-                <input type="text" id="fillPercent" value="100" size="4"/>
-            </div>
-            <div class="control" id="maxBranchCtrl">
-                <div class="slider">
-                    <div id="maxBranchSlide"></div>
-                </div>
-                <input type="text" id="maxBranchCount" value="100" size="4"/>
-            </div>
-        </div>
-        <div class="container">
-            <h2>Chaos</h2>
-            <div class="control">
-                Randomization: <span id="weight_text"></span><br/>
-                <div class="slider">
-                    <div id="weightSlide"></div>
-                </div>
-                <input type="text" id="weight" value="0.1" size="4"/>
-            </div>
-        </div>
+<head>
+    <!--<script type="text/javascript" src="jquery.js"></script>-->
+    <link rel="stylesheet" href="css/jquery-ui-1.10.0.custom.css"/>
+    <link rel="stylesheet" href="willow.css"/>
+    <script src="jquery/jquery-1.9.0.js"></script>
+    <script src="angular/angular.js"></script>
+    <script src="jquery/jquery-ui-1.10.0.custom.js"></script>
+    <script type="text/javascript" src="js-gen/set.js"></script>
+    <script type="text/javascript" src="js-gen/point.js"></script>
+    <script type="text/javascript" src="js-gen/directions.js"></script>
+    <script type="text/javascript" src="js-gen/grid.js"></script>
+    <script type="text/javascript" src="js-gen/app.js"></script>
+</head>
+<body ng-controller="WillowCtrl">
+<div id="controls">
+    <div class="container">
+        <h2>Style</h2>
+        <div control="style"></div>
     </div>
-
-    <div id="buttonContainer" class="container">
-        <div class="control">
-            <input type="button" id="go" value="Go!" />
-        </div>
+    <div class="container">
+        <h2>Branching</h2>
+        <div control="branchStyle" ></div>
+        <div control="branchTtl"></div>
+        <div control="fade" ></div>
     </div>
-
-    <div id="drawArea">
-        <canvas id="canvas"></canvas>
+    <div class="container">
+        <h2>Completion</h2>
+        <div control="finishStyle"></div>
     </div>
+    <div class="container">
+        <h2>Chaos</h2>
+        <div control="weight"></div>
+    </div>
+</div>
 
-    </body>
+<input type="button" class="toggle" id="go" value-on="Stop" value-off="Go!" model="running" />
+
+<div id="drawArea">
+    <canvas id="canvas"></canvas>
+</div>
+
+</body>
 </html>

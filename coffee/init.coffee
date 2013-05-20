@@ -1,3 +1,5 @@
+directionalArgSlide = false
+
 argNames =
   favorDirection: 'Direction',
   inertia: 'Mutation rate',

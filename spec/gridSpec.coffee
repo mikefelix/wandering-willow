@@ -20,12 +20,11 @@ describe "Grid", ->
       width: 100
       height: 100
       getContext: -> context
-    @g = new Grid
-      canvas: canvas
-      cellSize: 10
+    @g = new Grid canvas
     @g.init
       directionStyle: 'random'
       branchStyle: 'random'
+      cellSize: 10
 
   it 'always finds the only open neighbor', ->
     @g.drawn.add(@g.point(5,5))

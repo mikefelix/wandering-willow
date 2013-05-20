@@ -1,5 +1,5 @@
 class Grid
-  constructor: (@canvas, @onDone) ->
+  constructor: (@canvas) ->
     @directionFunctions = new DirectionFunctions()
     @branchFunctions = new BranchFunctions()
 
@@ -8,13 +8,12 @@ class Grid
     @c = @canvas.getContext('2d')
     @c.lineWidth = 1
     @c.clearRect 0, 0, @canvas.width, @canvas.height
-    @strokeStyle = opts['strokeStyle']
+    @strokeStyle = opts['strokeStyle'] or 'white'
     @cellSize = opts['cellSize'] or 10
     @currDirection = Math.floor(Math.random() * 8)
     @width = Math.floor(@canvas.width / @cellSize)
     @height = Math.floor(@canvas.height / @cellSize)
-    @getDirections = @directionFunctions[opts['directionStyle']](opts['directionArg'])
-    @getDirections = @directionFunctions.weight(opts['weight'], @getDirections) if opts['weight']?
+    @getDirections = @getDirectionFunc opts
     @getBranchPoint = @branchFunctions[opts['branchStyle']]()
     @maxBranchAge = parseInt opts['branchTtl']
     @fillPercent = parseFloat opts['fillPercent'] if opts['fillPercent']?
@@ -30,6 +29,20 @@ class Grid
     @origin = @center
     @markDrawn @origin
     @finish = false
+
+  getDirectionFunc: (opts) ->
+    style = opts['directionStyle']
+    arg = switch style
+      when 'favorDirection' then opts['direction']
+      when 'bounce' then opts['direction']
+      when 'x' then opts['width']
+      when 'inertia' then opts['mutation']
+      else null
+    func = @directionFunctions[style](arg)
+    if opts['randomization']?
+      weight = Math.abs(parseFloat(opts['randomization']) - 1)
+      func = @directionFunctions.weight(weight, func)
+    func
 
   getStrokeStyle: ->
     return @strokeStyle() if typeof @strokeStyle is 'function'

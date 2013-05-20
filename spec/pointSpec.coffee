@@ -13,12 +13,11 @@ describe "Point", ->
       width: 100
       height: 100
       getContext: -> context
-    g = new Grid
-      canvas: canvas
-      cellSize: 10
+    g = new Grid canvas
     g.init
       directionStyle: 'random'
       branchStyle: 'random'
+      cellSize: 10
     @p33 = g.point(3, 3)
     @p34 = g.point(3, 4)
     @p35 = g.point(3, 5)
