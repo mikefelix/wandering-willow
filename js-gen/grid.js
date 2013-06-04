@@ -37,10 +37,10 @@ Grid = (function() {
     this.getDirections = this.getDirectionFunc(opts);
     this.getBranchPoint = this.branchFunctions[opts['branchStyle']]();
     this.maxBranchAge = parseInt(opts['branchTtl']);
-    if (opts['fillPercent'] != null) {
+    if (opts['finishStyle'] === 'percent') {
       this.fillPercent = parseFloat(opts['fillPercent']);
     }
-    if (opts['maxBranchCount'] != null) {
+    if (opts['finishStyle'] === 'branch') {
       this.maxBranchCount = parseInt(opts['maxBranchCount']);
     }
     if (opts['onDone'] != null) {

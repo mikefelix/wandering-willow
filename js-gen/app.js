@@ -57,6 +57,15 @@ app.factory('control', function(directions) {
 });
 
 app.controller('WillowCtrl', function($scope, control) {
+  $scope.weight = control({
+    id: 'weight',
+    name: 'Randomization',
+    min: 0,
+    max: 1,
+    step: 0.01,
+    start: 0.02,
+    display: 'percent'
+  });
   $scope.direction = control({
     id: 'direction',
     name: 'Direction',
@@ -211,10 +220,18 @@ app.controller('WillowCtrl', function($scope, control) {
     }
   });
   return $scope.go = function() {
-    $scope.grid = new Grid($('#canvas')[0]);
+    var c;
+
+    c = $('#canvas')[0];
+    c.width = c.clientWidth - 16;
+    c.height = c.clientHeight - 16;
+    c.style.width = c.width + 'px';
+    c.style.height = c.height + 'px';
+    $scope.grid = new Grid(c);
     return $scope.grid.draw({
       cellSize: 10,
       strokeStyle: $scope.fade.value ? 'fade' : 'white',
+      finishStyle: $scope.finishStyle.value,
       directionStyle: $scope.style.value,
       direction: $scope.direction.value,
       branchStyle: $scope.branchStyle.value,
@@ -222,6 +239,7 @@ app.controller('WillowCtrl', function($scope, control) {
       fillPercent: $scope.fillPercent.value,
       maxBranchCount: $scope.maxBranchCount.value,
       branchTtl: $scope.branchTtl.value,
+      weight: $scope.weight.value,
       speed: 0,
       onDone: function() {
         return $scope.running = false;

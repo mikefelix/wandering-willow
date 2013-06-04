@@ -16,8 +16,8 @@ class Grid
     @getDirections = @getDirectionFunc opts
     @getBranchPoint = @branchFunctions[opts['branchStyle']]()
     @maxBranchAge = parseInt opts['branchTtl']
-    @fillPercent = parseFloat opts['fillPercent'] if opts['fillPercent']?
-    @maxBranchCount = parseInt opts['maxBranchCount'] if opts['maxBranchCount']?
+    @fillPercent = parseFloat opts['fillPercent'] if opts['finishStyle'] is 'percent'
+    @maxBranchCount = parseInt opts['maxBranchCount'] if opts['finishStyle'] is 'branch'
     @onDone = opts['onDone'] if opts['onDone']?
     @drawn = new Set()
     @surrounded = new Set()
