@@ -1,0 +1,138 @@
+<html>
+    <head>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+        <script type="text/javascript">
+            var app = angular.module('app', []);
+
+            app.filter('round', function(){
+                return function(num){
+                    return num.toFixed(2);
+                };
+            });
+
+            app.controller('appCtrl', function($scope, $window){
+                var calcMin = function(){
+                    if (!$scope.hrs)
+                        $scope.min = 0;
+                    else
+                        $scope.min = $scope.hrs * 60;
+                };
+
+                var calcHrs = function(){
+                    if (!$scope.min)
+                        $scope.hrs = 0;
+                    else
+                        $scope.hrs = $scope.min / 60;
+                };
+
+                var calcKph = function(){
+                    if (!$scope.hrs)
+                        $scope.kph = 0;
+                    else
+                        $scope.kph = $scope.km / $scope.hrs;
+                };
+
+                var calcMph = function(){
+                    if (!$scope.hrs)
+                        $scope.mph = 0;
+                    else
+                        $scope.mph = $scope.mil / $scope.hrs;
+                };
+
+                var calcKm = function(){
+                    $scope.km = $scope.mil * 1.6;
+                };
+
+                var calcMil = function(){
+                    if (!$scope.km)
+                        $scope.mil = 0;
+                    else
+                        $scope.mil = $scope.km / 1.6;
+                }
+
+                var calcMinpm = function(){
+                    if (!$scope.mil)
+                        $scope.minpm = 0;
+                    else
+                        $scope.minpm = (60 * $scope.hrs) / $scope.mil;
+                };
+
+                var calcMinpk = function(){
+                    if (!$scope.km)
+                        $scope.minpk = 0;
+                    else
+                        $scope.minpk = (60 * $scope.hrs) / $scope.km;
+                };
+
+                var refresh = function(changed){
+                    return function(){
+                      if (changed != 'hrs') calcHrs();
+                      if (changed != 'min') calcMin();
+                      if (changed != 'mil') calcMil();
+                      if (changed != 'km') calcKm();
+                      if (changed != 'kph') calcKph();
+                      if (changed != 'mph') calcMph();
+                      if (changed != 'minpm') calcMinpm();
+                      if (changed != 'minpk') calcMinpk();
+                    };
+                };
+
+                $scope.$watch('mil', refresh('mil'));
+                $scope.$watch('km', refresh('km'));
+                $scope.$watch('mph', refresh('mph'));
+                $scope.$watch('kph', refresh('kph'));
+                $scope.$watch('min', refresh('min'));
+                $scope.$watch('hrs', refresh('hrs'));
+                $scope.$watch('minpm', refresh('minpm'));
+                $scope.$watch('minpk', refresh('minpk'));
+
+                $scope.min = 30;
+                $scope.mil = 3.125;
+
+            });
+        </script>
+        <style>
+            #toRun {
+                font-size: 1.2em;
+            }
+
+            input {
+                width: 40px;
+                border: none;
+                background: #eee;
+            }
+
+            .fl {
+                float:left;
+                border: 1px solid #666;
+                height: 40px;
+                padding:10px;
+                vertical-align: middle;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="calculator" ng-app="app" ng-controller="appCtrl">
+            <div id="toRun">To run:</div>
+            <div class="fl">
+              <input type="text" ng-model="mil" /> miles<br/>
+              <input type="text" ng-model="km" class="second"/> km
+            </div>
+            <div class="fl">in</div>
+            <div class="fl">
+                <input type="text" ng-model="min" /> minutes<br/>
+                <input type="text" ng-model="hrs" class="second" /> hours
+            </div>
+            <div class="fl">take</div>
+            <div class="fl">
+              <input type="text" ng-model="minpm" /> min/mil<br/>
+              <input type="text" ng-model="minpk" class="second" /> min/km
+            </div>
+            <div class="fl">at</div>
+            <div class="fl">
+              <input type="text" ng-model="mph" /> mph<br/>
+              <input type="text" ng-model="kph" class="second" /> km/h
+            </div>
+        </div>
+    </body>
+</html>
