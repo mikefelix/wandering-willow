@@ -77,8 +77,8 @@
                     }
 
                     if (changed == 'km' || changed == 'hrs'){
+                        $scope.kph = $scope.hrs == 0 ? 0 : ($scope.km / $scope.hrs).toFixed(2);
                         $scope.minpk = $scope.km == 0 ? 0 : (60 / $scope.km).toFixed(2);
-                        $scope.kph = $scope.kph.toFixed(2);
                     }
                     else if (changed == 'kph'){
                         $scope.km = ($scope.hrs * $scope.kph).toFixed(2);
