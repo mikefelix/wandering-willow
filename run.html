@@ -11,102 +11,75 @@
             });
 
             app.controller('appCtrl', function($scope){
-                var minFromHrs = function(){
-                    $scope.min = $scope.hrs * 60;
+                var calcSpeeds = function(){
+                    $scope.kph = $scope.hrs == 0 ? 0 : ($scope.km / $scope.hrs).toFixed(2);
+                    $scope.mph = $scope.hrs == 0 ? 0 : ($scope.mil / $scope.hrs).toFixed(2);
                 };
 
-                var calcHrs = function(){
-                    if (!$scope.min)
-                        $scope.hrs = 0;
-                    else
-                        $scope.hrs = $scope.min / 60;
+                var calcRates = function(){
+                    $scope.minpk = $scope.km == 0 ? 0 : (60 / $scope.km).toFixed(2);
+                    $scope.minpm = $scope.mil == 0 ? 0 : (60 / $scope.mil).toFixed(2);
                 };
 
-                var calcKph = function(){
-                    if (!$scope.hrs)
-                        $scope.kph = 0;
-                    else
-                        $scope.kph = $scope.km / $scope.hrs;
+                var calcTimes = function(){
+                    $scope.min = $scope.mph == 0 ? 0 : ($scope.mil / $scope.mph).toFixed(2);
+                    $scope.hrs = ($scope.min / 60).toFixed(2);
                 };
 
-                var calcMph = function(){
-                    if (!$scope.hrs)
-                        $scope.mph = 0;
-                    else
-                        $scope.mph = $scope.mil / $scope.hrs;
+                var calcDists = function(){ 
+                    $scope.km = $scope.kph * $scope.hrs;
+                    $scope.mil = $scope.mph * $scope.hrs; 
                 };
 
-                var calcKm = function(){
-                    $scope.km = $scope.mil * 1.6;
-                };
-
-                var calcMil = function(){
-                    if (!$scope.km)
-                        $scope.mil = 0;
-                    else
-                        $scope.mil = $scope.km / 1.6;
-                };
-
-                var calcMinpm = function(){
-                    if (!$scope.mil)
-                        $scope.minpm = 0;
-                    else
-                        $scope.minpm = (60 * $scope.hrs) / $scope.mil;
-                };
-
-                var calcMinpk = function(){
-                    $scope.minpk = $scope.kph == 0 ? 0 : (60 / $scope.kph).toFixed(2);
-                };
-
-                var refresh = function(changed){
+                $scope.change = function(changed){
                     if (changed == 'mil'){
                         $scope.km = ($scope.mil * 1.60934).toFixed(2);
-                        changed = 'km';
+                        calcSpeeds();
+                        calcRates();
+                    }
+                    else if (changed == 'km'){
+                        $scope.mil = ($scope.mil / 1.60934).toFixed(2);
+                        calcSpeeds();
+                        calcRates();
                     }
                     else if (changed == 'mph'){
                         $scope.kph = ($scope.mph * 1.60934).toFixed(2);
-                        changed = 'kph';
+                        calcTimes();
+                        calcRates();
+                    }
+                    else if (changed == 'kph'){
+                        $scope.mph = ($scope.kph / 1.60934).toFixed(2);
+                        calcTimes();
+                        calcRates();
                     }
                     else if (changed == 'minpm'){
                         $scope.minpk = ($scope.minpm / 1.60934).toFixed(2);
-                        changed = 'minpk';
+                        calcTimes();
+                        calcSpeeds();
+                    }
+                    else if (changed == 'minpk'){
+                        $scope.minpm = ($scope.minpk * 1.60934).toFixed(2);
+                        calcTimes();
+                        calcSpeeds();
+                    }
+                    else if (changed == 'hrs'){
+                        $scope.min = ($scope.hrs * 60).toFixed(2);
+                        calcSpeeds();
+                        calcRates();
                     }
                     else if (changed == 'min'){
                         $scope.hrs = ($scope.min / 60).toFixed(2);
-                        changed = 'hrs';
+                        calcSpeeds();
+                        calcRates();
                     }
-
-                    if (changed == 'km' || changed == 'hrs'){
-                        $scope.kph = $scope.hrs == 0 ? 0 : ($scope.km / $scope.hrs).toFixed(2);
-                        $scope.minpk = $scope.km == 0 ? 0 : (60 / $scope.km).toFixed(2);
-                    }
-                    else if (changed == 'kph'){
-                        $scope.km = ($scope.hrs * $scope.kph).toFixed(2);
-                        $scope.minpk = $scope.kph == 0 ? 0 : (60 / $scope.kph).toFixed(2);
-                    }
-                    else if (changed == 'minpk'){
-                        $scope.kph = ($scope.minpk / 60).toFixed(2);
-                        $scope.km = ($scope.hrs * $scope.kph).toFixed(2);
-                    }
-
-                    $scope.mph = ($scope.kph / 1.60934).toFixed(2);
-                    $scope.mil = ($scope.km / 1.60934).toFixed(2);
-                    $scope.minpm = ($scope.minpk / 1.60934).toFixed(2);
-                    $scope.min = ($scope.hrs * 60).toFixed(2);
                 };
 
-                $scope.$watch('mil', refresh('mil'));
-                $scope.$watch('km', refresh('km'));
-                $scope.$watch('mph', refresh('mph'));
-                $scope.$watch('kph', refresh('kph'));
-                $scope.$watch('min', refresh('min'));
-                $scope.$watch('hrs', refresh('hrs'));
-                $scope.$watch('minpm', refresh('minpm'));
-                $scope.$watch('minpk', refresh('minpk'));
-
+                $scope.km = 5;
+                $scope.mil = 3.11;
                 $scope.min = 30;
-                $scope.mil = 3.125;
+                $scope.hrs = 0.5;
 
+                $scope.change('min');
             });
         </script>
         <style>
@@ -133,23 +106,23 @@
         <div id="calculator" ng-app="app" ng-controller="appCtrl">
             <div id="toRun">To run:</div>
             <div class="fl">
-              <input type="text" ng-model="mil" /> miles<br/>
-              <input type="text" ng-model="km" class="second"/> km
+              <input type="text" ng-model="mil" ng-change="change('mil')" /> miles<br/>
+              <input type="text" ng-model="km" ng-change="change('km')" class="second"/> km
             </div>
             <div class="fl">in</div>
             <div class="fl">
-                <input type="text" ng-model="min" /> minutes<br/>
-                <input type="text" ng-model="hrs" class="second" /> hours
+                <input type="text" ng-model="min" ng-change="change('min')" /> minutes<br/>
+                <input type="text" ng-model="hrs" ng-change="change('hrs')" class="second" /> hours
             </div>
-            <div class="fl">take</div>
+            <div class="fl">go</div>
             <div class="fl">
-              <input type="text" ng-model="minpm" /> min/mil<br/>
-              <input type="text" ng-model="minpk" class="second" /> min/km
+              <input type="text" ng-model="mph" ng-change="change('mph')"/> mph<br/>
+              <input type="text" ng-model="kph" ng-change="change('kph')" class="second" /> km/h
             </div>
-            <div class="fl">at</div>
+            <div class="fl">or</div>
             <div class="fl">
-              <input type="text" ng-model="mph" /> mph<br/>
-              <input type="text" ng-model="kph" class="second" /> km/h
+              <input type="text" ng-model="minpm" ng-change="change('minpm')" /> min/mil<br/>
+              <input type="text" ng-model="minpk" ng-change="change('minpk')" class="second" /> min/km
             </div>
         </div>
     </body>
